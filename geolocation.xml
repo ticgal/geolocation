@@ -1,0 +1,44 @@
+<root>
+   <name>Geolocation</name>
+   <key>geolocation</key>
+   <state>stable</state> <!-- stable | unstable | beta | alpha -->
+   <logo>https://raw.githubusercontent.com/ticgal/geolocation/multimedia/geolocation.png</logo>
+   <description>
+      <short>
+		<en>Geolocation is a GLPI Plugin to add coordinates to Tickets and Assets</en>
+      </short>
+      <long>
+	      <en>Geolocation is a GLPI Plugin to add coordinates to ITILObjects (Tickets) and CommonDBTM (Assets). Adds an editable map per ticket-asset to fine tune the location.<en>
+      </long>
+   </description>
+   <homepage>https://tic.gal/en/project/geolocation/</homepage>
+   <download>https://github.com/ticgal/geolocation/releases</download>
+   <issues>https://github.com/ticgal/geolocation/issues</issues>
+   <readme>https://github.com/ticgal/geolocation/blob/master/README.md</readme>
+   <authors>
+      <author>TICgal</author>
+   </authors>
+   <versions>
+       <version>
+            <num>1.0.0</num>
+            <compatibility>~10.0.0</compatibility>
+            <download_url>https://github.com/ticgal/geolocation/releases/download/1.0.0/glpi-geolocation-1.0.0.tar.tgz</download_url>
+       </version>
+   </versions>
+   <langs>
+      <lang>en_GB</lang>
+   </langs>
+   <license>AGPL v3+</license>
+   <tags>
+      	<en>
+            <tag>Inventory</tag>
+    	    <tag>Helpdesk</tag>
+	    <tag>Ticket</tag>
+        </en>
+   </tags>
+   <screenshots>
+      <screenshot>https://raw.githubusercontent.com/ticgal/geolocation/multimedia/geolocation-glpi-plugin-1.png</screenshot>
+      <screenshot>https://raw.githubusercontent.com/ticgal/geolocation/multimedia/geolocation-glpi-plugin-2.png</screenshot>
+      <screenshot>https://raw.githubusercontent.com/ticgal/geolocation/multimedia/geolocation-glpi-plugin-3.png</screenshot>
+   </screenshots>
+</root>
