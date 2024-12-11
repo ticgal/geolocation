@@ -22,7 +22,7 @@
        <version>
             <num>1.0.0</num>
             <compatibility>~10.0.0</compatibility>
-            <download_url>https://github.com/ticgal/geolocation/releases/download/1.0.0/glpi-geolocation-1.0.0.tar.tgz</download_url>
+            <download_url>https://github.com/ticgal/geolocation/releases/download/1.0.0/glpi-geolocation-1.0.0.tar.bz2</download_url>
        </version>
    </versions>
    <langs>
