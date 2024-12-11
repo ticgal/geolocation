@@ -27,18 +27,55 @@
  @since     2022
  ----------------------------------------------------------------------
 */
-include('../../../inc/includes.php');
-$plugin = new Plugin();
-if (!$plugin->isInstalled('geolocation') || !$plugin->isActivated('geolocation')) {
-	Html::displayNotFoundError();
-}
 
-Session::checkRight('config', UPDATE);
+include("../../../inc/includes.php");
+header("Content-Type: text/html; charset=UTF-8");
+Html::header_nocache();
 
-$config = new PluginGeolocationConfig();
-if (isset($_POST["update"])) {
-	$config->check($_POST['id'], UPDATE);
-	$config->update($_POST);
-	Html::back();
+Session::checkLoginUser();
+
+$result = [];
+if (!isset($_POST['itemtype']) || !isset($_POST['params'])) {
+	http_response_code(500);
+	$result = [
+		'success'   => false,
+		'message'   => __('Required argument missing!')
+	];
+} else {
+	$itemtype = $_POST['itemtype'];
+	$params   = $_POST['params'];
+
+	$data = Search::prepareDatasForSearch($itemtype, $params);
+	Search::constructSQL($data);
+	Search::constructData($data);
+
+	$rows = $data['data']['rows'];
+	$items_id = [];
+	$titles = [];
+	foreach ($rows as $row) {
+		$items_id[] = $row['raw']['id'];
+		$titles[$row['raw']['id']] = $row['raw']["ITEM_".$itemtype."_1"];
+	}
+	$points = [];
+	if (count($items_id) > 0) {
+		$query = [
+			'FROM' => PluginGeolocationGeolocation::getTable(),
+			'WHERE' => [
+				'itemtype' => $itemtype,
+				'items_id' => $items_id
+			]
+		];
+		$iterator = $DB->request($query);
+		foreach ($iterator as $result) {
+			$points[$result['id']] = [
+				'lat' => $result['latitude'],
+				'lng' => $result['longitude'],
+				'title' => $titles[$result['items_id']],
+				'url' => $itemtype::getFormURLWithID($result['items_id']),
+				'count' => 1
+			];
+		}
+	}
+	$result['points'] = $points;
 }
-Html::redirect($CFG_GLPI["root_doc"] . "/front/config.form.php?forcetab=" . urlencode('PluginGeolocationConfig$1'));
+echo json_encode($result);

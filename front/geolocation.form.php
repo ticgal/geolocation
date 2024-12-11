@@ -27,18 +27,27 @@
  @since     2022
  ----------------------------------------------------------------------
 */
+
 include('../../../inc/includes.php');
-$plugin = new Plugin();
-if (!$plugin->isInstalled('geolocation') || !$plugin->isActivated('geolocation')) {
-	Html::displayNotFoundError();
-}
 
-Session::checkRight('config', UPDATE);
+$geo = new PluginGeolocationGeolocation();
+if (isset($_POST['add'])) {
+	$geo->check(-1, CREATE, $_POST);
 
-$config = new PluginGeolocationConfig();
-if (isset($_POST["update"])) {
-	$config->check($_POST['id'], UPDATE);
-	$config->update($_POST);
+	$newID = $geo->add($_POST, false);
+	Html::back();
+} else if (isset($_POST["purge"])) {
+	$geo->check($_POST["id"], PURGE);
+	$geo->delete($_POST, 1);
+	Html::back();
+} else if (isset($_POST["update"])) {
+	$geo->check($_POST["id"], UPDATE);
+	if (empty($_POST['latitude']) && empty($_POST['longitude'])) {
+		$geo->check($_POST["id"], PURGE);
+		$geo->delete($_POST, 1);
+	} else {
+		$geo->update($_POST);
+	}
 	Html::back();
 }
-Html::redirect($CFG_GLPI["root_doc"] . "/front/config.form.php?forcetab=" . urlencode('PluginGeolocationConfig$1'));
+Html::back();

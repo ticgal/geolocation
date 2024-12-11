@@ -27,18 +27,24 @@
  @since     2022
  ----------------------------------------------------------------------
 */
+
 include('../../../inc/includes.php');
-$plugin = new Plugin();
-if (!$plugin->isInstalled('geolocation') || !$plugin->isActivated('geolocation')) {
-	Html::displayNotFoundError();
+
+Session::checkLoginUser();
+
+if (!Session::haveRight(PluginGeolocationGeolocation::$rightname, READ)) {
+	Html::displayRightError();
 }
-
-Session::checkRight('config', UPDATE);
-
-$config = new PluginGeolocationConfig();
-if (isset($_POST["update"])) {
-	$config->check($_POST['id'], UPDATE);
-	$config->update($_POST);
+if (!isset($_GET['itemtype'])) {
 	Html::back();
 }
-Html::redirect($CFG_GLPI["root_doc"] . "/front/config.form.php?forcetab=" . urlencode('PluginGeolocationConfig$1'));
+
+$menu = 'assets';
+if (getItemForItemtype($_GET['itemtype']) instanceof CommonITILObject) {
+	$menu = 'helpdesk';
+}
+Html::header($_GET['itemtype']::getTypeName(Session::getPluralNumber()), '', $menu, $_GET['itemtype']::getType());
+
+PluginGeolocationGeolocation::show($_GET['itemtype']);
+
+Html::footer();
