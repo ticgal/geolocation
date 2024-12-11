@@ -5,10 +5,10 @@
    <logo>https://raw.githubusercontent.com/ticgal/geolocation/multimedia/geolocation.png</logo>
    <description>
       <short>
-		<en>Geolocation is a GLPI Plugin to add coordinates to Tickets and Assets</en>
+	<en>Geolocation is a GLPI Plugin to add coordinates to Tickets and Assets</en>
       </short>
       <long>
-	      <en>Geolocation is a GLPI Plugin to add coordinates to ITILObjects (Tickets) and CommonDBTM (Assets). Adds an editable map per ticket-asset to fine tune the location.<en>
+	<en>Geolocation is a GLPI Plugin to add coordinates to ITILObjects (Tickets) and CommonDBTM (Assets). Adds an editable map per ticket-asset to fine-tune the location.</en>
       </long>
    </description>
    <homepage>https://tic.gal/en/project/geolocation/</homepage>
