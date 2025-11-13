@@ -84,11 +84,11 @@ sub do_file{
     foreach (@lines){
         # Did we found header closure tag ?
         if ($_ =~ m/$format\*\// || $_ =~ m/$format\#\}/){
-            # if line is */ or #} add a space before to fix comment style
+            # if line starts with */ or #} add a space before to fix comment style
             if ($_ =~ m/$format\*\//){
-                $_ =~ s/$format\*\// $format\*\//;
-            } else if ($_ =~ m/$format\#\}/){
-                $_ =~ s/$format\#\}/ $format\#\}/;
+                $_ =~ s/^$format\*\// $format\*\//;
+            } elsif ($_ =~ m/$format\#\}/){
+                $_ =~ s/^$format\#\}/ $format\#\}/;
             }
             $status="END";
         }
@@ -115,9 +115,9 @@ sub do_file{
                 #print "Replacing header on $file.\n";
 
                 if ($mode == 0) {
-                    open(HEADER_FILE,"HEADER");
+                    open(HEADER_FILE,"TICGAL_HEADER");
                 } else {
-                    open(HEADER_FILE,"tools/HEADER");
+                    open(HEADER_FILE,"tools/TICGAL_HEADER");
                 }
 
                 @headers=<HEADER_FILE>;
