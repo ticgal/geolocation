@@ -33,7 +33,6 @@ if (!defined('GLPI_ROOT')) {
 }
 
 use Glpi\Application\View\TemplateRenderer;
-use Glpi\Toolbox\Sanitizer;
 
 class PluginGeolocationGeolocation extends CommonDBChild
 {
@@ -87,7 +86,6 @@ class PluginGeolocationGeolocation extends CommonDBChild
 
 	public static function showFormItem(?CommonGLPI $item)
 	{
-
 		if (!self::canView()) {
 			return false;
 		}
