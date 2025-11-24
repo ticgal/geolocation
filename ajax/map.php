@@ -7,7 +7,7 @@ Copyright (C) 2022 by the TICgal Team.
 https://www.tic.gal
 -------------------------------------------------------------------------
 LICENSE
-This file is part of the Geolocation plugin. 
+This file is part of the Geolocation plugin.
 Geolocation plugin is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 3 of the License, or
@@ -44,7 +44,7 @@ if (!isset($_POST['itemtype']) || !isset($_POST['params'])) {
     $result = [
         'success'   => false,
         'message'   => __('Required argument missing!')
-	];
+    ];
 } else {
     $itemtype = $_POST['itemtype'];
     $params   = $_POST['params'];

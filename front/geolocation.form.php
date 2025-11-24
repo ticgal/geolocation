@@ -47,7 +47,7 @@ if (isset($_POST['add'])) {
         $geo->check($_POST["id"], PURGE);
         $geo->delete($_POST, 1);
     } else {
-		$geo->update($_POST);
+        $geo->update($_POST);
     }
     Html::back();
 }

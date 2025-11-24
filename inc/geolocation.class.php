@@ -36,13 +36,12 @@ use Glpi\Application\View\TemplateRenderer;
 
 class PluginGeolocationGeolocation extends CommonDBChild
 {
-
     public static $itemtype        = 'itemtype';
     public static $items_id        = 'items_id';
     public $dohistory              = true;
-    static $rightname = "plugin_geolocation_geolocation";
+    public static $rightname = "plugin_geolocation_geolocation";
 
-    static function getTypeName($nb = 0)
+    public static function getTypeName($nb = 0)
     {
         return 'Geolocation';
     }
@@ -161,7 +160,8 @@ class PluginGeolocationGeolocation extends CommonDBChild
                 [
                     'criteria'     => $criteria,
                     'metacriteria' => $data['search']['metacriteria']
-                ],'&amp;'
+                ],
+    '&amp;'
             );
             $sort_params = Toolbox::append_params([
                 'sort'   => $data['search']['sort'],
@@ -270,43 +270,43 @@ class PluginGeolocationGeolocation extends CommonDBChild
         echo "</div>";
     }
 
-	public static function showGeolocation(CommonDBTM $item)
-	{
+    public static function showGeolocation(CommonDBTM $item)
+    {
 
-		$geolocation = new self();
-		if (!$geolocation->getFromDBByCrit(['itemtype' => $item::getType(), 'items_id' => $item->getID()])) {
-			$geolocation->getEmpty();
-		}
+        $geolocation = new self();
+        if (!$geolocation->getFromDBByCrit(['itemtype' => $item::getType(), 'items_id' => $item->getID()])) {
+            $geolocation->getEmpty();
+        }
 
-		echo "<div class='form-field row col-12 mb-2'>";
-		echo "<label class='col-form-label col-xxl-4 text-xxl-end' for='latitude'>" . __('Latitude') . "</label>";
-		echo "<div class='col-xxl-8 field-container'>";
-		echo "<input type='number' id='latitude' step='any' class='form-control' name='latitude' value='" . $geolocation->fields['latitude'] . "'>";
-		echo "</div>";
-		echo "</div>";
+        echo "<div class='form-field row col-12 mb-2'>";
+        echo "<label class='col-form-label col-xxl-4 text-xxl-end' for='latitude'>" . __('Latitude') . "</label>";
+        echo "<div class='col-xxl-8 field-container'>";
+        echo "<input type='number' id='latitude' step='any' class='form-control' name='latitude' value='" . $geolocation->fields['latitude'] . "'>";
+        echo "</div>";
+        echo "</div>";
 
-		echo "<div class='form-field row col-12 mb-2'>";
-		echo "<label class='col-form-label col-xxl-4 text-xxl-end' for='longitude'>" . __('Longitude') . "</label>";
-		echo "<div class='col-xxl-8 field-container'>";
-		echo "<input type='number' id='longitude' step='any' class='form-control' name='longitude' value='" . $geolocation->fields['longitude'] . "'>";
-		echo "</div>";
-		echo "</div>";
+        echo "<div class='form-field row col-12 mb-2'>";
+        echo "<label class='col-form-label col-xxl-4 text-xxl-end' for='longitude'>" . __('Longitude') . "</label>";
+        echo "<div class='col-xxl-8 field-container'>";
+        echo "<input type='number' id='longitude' step='any' class='form-control' name='longitude' value='" . $geolocation->fields['longitude'] . "'>";
+        echo "</div>";
+        echo "</div>";
 
-		$geolocation->showMap();
-	}
+        $geolocation->showMap();
+    }
 
-	/**
-	 * get openstreetmap
-	 */
-	public function showMap()
-	{
-		$rand = mt_rand();
+    /**
+    * get openstreetmap
+    */
+    public function showMap()
+    {
+        $rand = mt_rand();
 
-		echo "<div id='setlocation_container_{$rand}'></div>";
-		$js = "
-      $(function(){
-         var map_elt, _marker;
-         var _setLocation = function(lat, lng) {
+        echo "<div id='setlocation_container_{$rand}'></div>";
+        $js = "
+        $(function(){
+        var map_elt, _marker;
+        var _setLocation = function(lat, lng) {
             if (_marker) {
                map_elt.removeLayer(_marker);
             }
@@ -317,9 +317,9 @@ class PluginGeolocationGeolocation extends CommonDBChild
                   maxZoom: 20
                }
             );
-         };
+        };
 
-         var _autoSearch = function() {
+        var _autoSearch = function() {
             var _tosearch = '';
             var _address = $('*[name=address]').val();
             var _town = $('*[name=town]').val();
@@ -341,8 +341,8 @@ class PluginGeolocationGeolocation extends CommonDBChild
             }
 
             $('.leaflet-control-geocoder-form > input[type=text]').val(_tosearch);
-         }
-         var finalizeMap = function() {
+        }
+        var finalizeMap = function() {
             var geocoder = L.Control.geocoder({
                 defaultMarkGeocode: false,
                 errorMessage: '" . __s('No result found') . "',
@@ -396,16 +396,16 @@ class PluginGeolocationGeolocation extends CommonDBChild
                   _setLocation(_curlat, _curlng);
                }
             });
-         }
+        }
 
-         // Geolocation may be disabled in the browser (e.g. geo.enabled = false in firefox)
-         if (!navigator.geolocation) {
+        // Geolocation may be disabled in the browser (e.g. geo.enabled = false in firefox)
+        if (!navigator.geolocation) {
             map_elt = initMap($('#setlocation_container_{$rand}'), 'setlocation_{$rand}', '200px');
             finalizeMap();
             return;
-         }
+        }
 
-         navigator.geolocation.getCurrentPosition(function(pos) {
+        navigator.geolocation.getCurrentPosition(function(pos) {
             // Try to determine an appropriate zoom level based on accuracy
             var acc = pos.coords.accuracy;
             if (acc > 3000) {
@@ -426,44 +426,43 @@ class PluginGeolocationGeolocation extends CommonDBChild
                 zoom: zoom
             });
             finalizeMap();
-         }, function() {
+        }, function() {
             map_elt = initMap($('#setlocation_container_{$rand}'), 'setlocation_{$rand}', '200px');
             finalizeMap();
-         }, {enableHighAccuracy: true});
+        }, {enableHighAccuracy: true});
+        });";
+        echo Html::scriptBlock($js);
+    }
 
-      });";
-		echo Html::scriptBlock($js);
-	}
+	     static function getIcon()
+    {
+        return "ti ti-map-2";
+    }
 
-	public static function getIcon()
-	{
-		return "ti ti-map-2";
-	}
+    public static function install(Migration $migration)
+    {
+        /** @var \DBmysql $DB */
+        global $DB;
 
-	static function install(Migration $migration)
-	{
-		/** @var \DBmysql $DB */
-		global $DB;
+        $default_charset = DBConnection::getDefaultCharset();
+        $default_collation = DBConnection::getDefaultCollation();
+        $default_key_sign = DBConnection::getDefaultPrimaryKeySignOption();
 
-		$default_charset = DBConnection::getDefaultCharset();
-		$default_collation = DBConnection::getDefaultCollation();
-		$default_key_sign = DBConnection::getDefaultPrimaryKeySignOption();
-
-		$table = self::getTable();
-		if (!$DB->tableExists($table)) {
-			$migration->displayMessage("Installing $table");
-			$query = "CREATE TABLE IF NOT EXISTS $table (
-				`id` int {$default_key_sign} NOT NULL auto_increment,
-				`itemtype` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-				`items_id` int {$default_key_sign} NOT NULL DEFAULT '0',
-				`latitude` decimal(9,6) NOT NULL DEFAULT '0.0000',
-				`longitude` decimal(9,6) NOT NULL DEFAULT '0.0000',
-				PRIMARY KEY (`id`),
-				UNIQUE KEY `unicity` (`itemtype`,`items_id`),
-				KEY `latitude` (`latitude`),
-				KEY `longitude` (`longitude`)
-				) ENGINE=InnoDB DEFAULT CHARSET={$default_charset} COLLATE={$default_collation} ROW_FORMAT=DYNAMIC;";
-			$DB->doQuery($query) or die($DB->error());
-		}
-	}
+        $table = self::getTable();
+        if (!$DB->tableExists($table)) {
+            $migration->displayMessage("Installing $table");
+            $query = "CREATE TABLE IF NOT EXISTS $table (
+                `id` int {$default_key_sign} NOT NULL auto_increment,
+                `itemtype` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+                `items_id` int {$default_key_sign} NOT NULL DEFAULT '0',
+                `latitude` decimal(9,6) NOT NULL DEFAULT '0.0000',
+                `longitude` decimal(9,6) NOT NULL DEFAULT '0.0000',
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `unicity` (`itemtype`,`items_id`),
+                KEY `latitude` (`latitude`),
+                KEY `longitude` (`longitude`)
+                ) ENGINE=InnoDB DEFAULT CHARSET={$default_charset} COLLATE={$default_collation} ROW_FORMAT=DYNAMIC;";
+            $DB->doQuery($query) or die($DB->error());
+        }
+    }
 }

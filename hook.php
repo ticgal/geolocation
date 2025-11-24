@@ -44,7 +44,7 @@ function plugin_geolocation_install()
     }
     $migration->executeMigration();
 
-    	return true;
+        return true;
 }
 
 function plugin_geolocation_uninstall()
@@ -72,7 +72,7 @@ function plugin_geolocation_postitemform($params = [])
             switch ($params['item']::getType()) {
                 case Ticket::getType():
                     PluginGeolocationGeolocation::showGeolocation($params['item']);
-                break;
+                    break;
             }
         }
     }
