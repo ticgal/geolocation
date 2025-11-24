@@ -1,4 +1,5 @@
 <?php
+
 /*
  -------------------------------------------------------------------------
  Geolocation plugin for GLPI
@@ -31,8 +32,8 @@
 use Glpi\Plugin\Hooks;
 
 define('PLUGIN_GEOLOCATION_VERSION', '1.0.0');
-define('PLUGIN_GEOLOCATION_MIN_GLPI', '10.0.0');
-define('PLUGIN_GEOLOCATION_MAX_GLPI', '10.1.99');
+define('PLUGIN_GEOLOCATION_MIN_GLPI', '11.0.0');
+define('PLUGIN_GEOLOCATION_MAX_GLPI', '11.9');
 
 function plugin_version_geolocation()
 {
@@ -53,13 +54,13 @@ function plugin_version_geolocation()
 
 function plugin_init_geolocation()
 {
+	/** @var array $PLUGIN_HOOKS */
 	global $PLUGIN_HOOKS;
 
 	$PLUGIN_HOOKS['csrf_compliant']['geolocation'] = true;
 
 	$plugin = new Plugin();
 	if ($plugin->isActivated('geolocation')) {
-
 		Plugin::registerClass('PluginGeolocationConfig', ['addtabon' => 'Config']);
 		$PLUGIN_HOOKS['config_page']['geolocation'] = 'front/config.form.php';
 

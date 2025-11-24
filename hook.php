@@ -1,4 +1,5 @@
 <?php
+
 /*
  -------------------------------------------------------------------------
  Geolocation plugin for GLPI
@@ -134,7 +135,7 @@ function plugin_geolocation_ticket_update(Ticket $ticket)
 			}
 		} elseif (empty($ticket->input['latitude']) && empty($ticket->input['longitude'])) {
 			if ($geolocation->getFromDBByCrit(['itemtype' => $ticket::getType(), 'items_id' => $ticket->getID()]) && Session::haveRight(PluginGeolocationGeolocation::$rightname, PURGE)) {
-				$geolocation->delete(['id' => $geolocation->getID()], 1);
+				$geolocation->delete(['id' => $geolocation->getID()], true);
 			}
 		}
 	}

@@ -1,4 +1,5 @@
 <?php
+
 /*
  -------------------------------------------------------------------------
  Geolocation plugin for GLPI
@@ -84,7 +85,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
 		return true;
 	}
 
-	public static function showFormItem(CommonGLPI $item)
+	public static function showFormItem(?CommonGLPI $item)
 	{
 
 		if (!self::canView()) {
@@ -143,6 +144,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
 
 	public static function show($itemtype)
 	{
+		/** @var array $CFG_GLPI */
 		global $CFG_GLPI;
 
 		$params = Search::manageParams($itemtype, $_GET);
@@ -467,6 +469,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
 
 	static function install(Migration $migration)
 	{
+		/** @var \DBmysql $DB */
 		global $DB;
 
 		$default_charset = DBConnection::getDefaultCharset();

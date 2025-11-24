@@ -1,4 +1,5 @@
 <?php
+
 /*
  -------------------------------------------------------------------------
  Geolocation plugin for GLPI
@@ -33,18 +34,18 @@ if (!defined('GLPI_ROOT')) {
 
 class PluginGeolocationProfile extends Profile
 {
-	static $rightname = "profile";
+	public static $rightname = "profile";
 
-	function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+	public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
 	{
 		switch ($item->getType()) {
 			case 'Profile':
 				return self::createTabEntry('Geolocation');
-				break;
 		}
+		return '';
 	}
 
-	static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+	public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
 	{
 		switch ($item->getType()) {
 			case 'Profile':
@@ -55,7 +56,7 @@ class PluginGeolocationProfile extends Profile
 		return true;
 	}
 
-	function showForm($profiles_id, $options = [])
+	public function showForm($profiles_id, $options = [])
 	{
 		if (!Session::haveRight("profile", READ)) {
 			return false;
@@ -87,6 +88,7 @@ class PluginGeolocationProfile extends Profile
 			echo "</div>\n";
 		}
 		Html::closeForm();
+		return true;
 	}
 
 	public static function getGeneralRights()
@@ -98,8 +100,9 @@ class PluginGeolocationProfile extends Profile
 		]];
 	}
 
-	static function uninstall()
+	public static function uninstall()
 	{
+		/** @var \DBmysql $DB */
 		global $DB;
 
 		$table = ProfileRight::getTable();

@@ -1,4 +1,5 @@
 <?php
+
 /*
  -------------------------------------------------------------------------
  Geolocation plugin for GLPI
@@ -34,10 +35,12 @@ if (!defined('GLPI_ROOT')) {
 
 class PluginGeolocationConfig extends CommonDBTM
 {
-	static private $_instance = null;
+	public static $rightname = 'config';
+	private static $_instance = null;
 
 	public function __construct()
 	{
+		/** @var \DBmysql $DB */
 		global $DB;
 		if ($DB->tableExists($this->getTable())) {
 			$this->getFromDB(1);
@@ -59,12 +62,12 @@ class PluginGeolocationConfig extends CommonDBTM
 		return Session::haveRight('config', UPDATE);
 	}
 
-	static function getTypeName($nb = 0)
+	public static function getTypeName($nb = 0)
 	{
 		return 'Geolocation';
 	}
 
-	static function getInstance()
+	public static function getInstance()
 	{
 		if (!isset(self::$_instance)) {
 			self::$_instance = new self();
@@ -75,19 +78,19 @@ class PluginGeolocationConfig extends CommonDBTM
 		return self::$_instance;
 	}
 
-	static function getConfig($update = false)
-    {
-        static $config = null;
-        if (is_null($config)) {
-            $config = new self();
-        }
-        if ($update) {
-            $config->getFromDB(1);
-        }
-        return $config;
-    }
+	public static function getConfig($update = false)
+	{
+		static $config = null;
+		if (is_null($config)) {
+			$config = new self();
+		}
+		if ($update) {
+			$config->getFromDB(1);
+		}
+		return $config;
+	}
 
-	function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+	public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
 	{
 		if ($item->getType() == 'Config') {
 			return self::getTypeName();
@@ -95,7 +98,7 @@ class PluginGeolocationConfig extends CommonDBTM
 		return '';
 	}
 
-	static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+	public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
 	{
 		if ($item->getType() == 'Config') {
 			self::showConfigForm();
@@ -113,8 +116,9 @@ class PluginGeolocationConfig extends CommonDBTM
 		return $config->fields["assets"];
 	}
 
-	static function showConfigForm()
+	public static function showConfigForm()
 	{
+		/** @var array $CFG_GLPI */
 		global $CFG_GLPI;
 
 		$config = new self();
@@ -155,8 +159,9 @@ class PluginGeolocationConfig extends CommonDBTM
 		return $input;
 	}
 
-	static function install(Migration $migration)
+	public static function install(Migration $migration)
 	{
+		/** @var \DBmysql $DB */
 		global $DB;
 
 		$default_charset = DBConnection::getDefaultCharset();
