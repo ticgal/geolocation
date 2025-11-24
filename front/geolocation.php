@@ -1,4 +1,5 @@
 <?php
+
 /*
  -------------------------------------------------------------------------
  Geolocation plugin for GLPI
@@ -22,7 +23,7 @@
  @author    the TICgal team
  @copyright Copyright (c) 2022 TICgal team
  @license   AGPL License 3.0 or (at your option) any later version
-				http://www.gnu.org/licenses/agpl-3.0-standalone.html
+            http://www.gnu.org/licenses/agpl-3.0-standalone.html
  @link      https://www.tic.gal
  @since     2022
  ----------------------------------------------------------------------
@@ -33,15 +34,15 @@ include('../../../inc/includes.php');
 Session::checkLoginUser();
 
 if (!Session::haveRight(PluginGeolocationGeolocation::$rightname, READ)) {
-	die();
+    die();
 }
 if (!isset($_GET['itemtype'])) {
-	Html::back();
+    Html::back();
 }
 
 $menu = 'assets';
 if (getItemForItemtype($_GET['itemtype']) instanceof CommonITILObject) {
-	$menu = 'helpdesk';
+    $menu = 'helpdesk';
 }
 Html::header($_GET['itemtype']::getTypeName(Session::getPluralNumber()), '', $menu, $_GET['itemtype']::getType());
 

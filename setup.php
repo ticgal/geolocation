@@ -54,31 +54,31 @@ function plugin_version_geolocation()
 
 function plugin_init_geolocation()
 {
-	/** @var array $PLUGIN_HOOKS */
-	global $PLUGIN_HOOKS;
+    /** @var array $PLUGIN_HOOKS */
+    global $PLUGIN_HOOKS;
 
-	$PLUGIN_HOOKS['csrf_compliant']['geolocation'] = true;
+    $PLUGIN_HOOKS['csrf_compliant']['geolocation'] = true;
 
-	$plugin = new Plugin();
-	if ($plugin->isActivated('geolocation')) {
-		Plugin::registerClass('PluginGeolocationConfig', ['addtabon' => 'Config']);
-		$PLUGIN_HOOKS['config_page']['geolocation'] = 'front/config.form.php';
+    $plugin = new Plugin();
+    if ($plugin->isActivated('geolocation')) {
+        Plugin::registerClass('PluginGeolocationConfig', ['addtabon' => 'Config']);
+        $PLUGIN_HOOKS['config_page']['geolocation'] = 'front/config.form.php';
 
-		Plugin::registerClass('PluginGeolocationProfile', ['addtabon' => 'Profile']);
+        Plugin::registerClass('PluginGeolocationProfile', ['addtabon' => 'Profile']);
 
-		Plugin::registerClass('PluginGeolocationGeolocation', ['addtabon' => PluginGeolocationConfig::getUsedItemtypes()]);
+        Plugin::registerClass('PluginGeolocationGeolocation', ['addtabon' => PluginGeolocationConfig::getUsedItemtypes()]);
 
-		$PLUGIN_HOOKS[Hooks::POST_ITEM_FORM]['geolocation'] = 'plugin_geolocation_postitemform';
+        $PLUGIN_HOOKS[Hooks::POST_ITEM_FORM]['geolocation'] = 'plugin_geolocation_postitemform';
 
-		$PLUGIN_HOOKS[Hooks::ITEM_ADD]['geolocation'] = [
-			'Ticket' => 'plugin_geolocation_ticket_add'
-		];
-		$PLUGIN_HOOKS[Hooks::PRE_ITEM_UPDATE]['geolocation'] = [
-			'Ticket' => 'plugin_geolocation_ticket_update'
-		];
+        $PLUGIN_HOOKS[Hooks::ITEM_ADD]['geolocation'] = [
+            'Ticket' => 'plugin_geolocation_ticket_add'
+        ];
+        $PLUGIN_HOOKS[Hooks::PRE_ITEM_UPDATE]['geolocation'] = [
+            'Ticket' => 'plugin_geolocation_ticket_update'
+        ];
 
-		$PLUGIN_HOOKS[Hooks::REDEFINE_MENUS]['geolocation'] = [PluginGeolocationGeolocation::class, 'geolocationRedefineMenu'];
+        $PLUGIN_HOOKS[Hooks::REDEFINE_MENUS]['geolocation'] = [PluginGeolocationGeolocation::class, 'geolocationRedefineMenu'];
 
-		$PLUGIN_HOOKS[Hooks::CHANGE_PROFILE]['geolocation'] = 'plugin_geolocation_changeProfile';
-	}
+        $PLUGIN_HOOKS[Hooks::CHANGE_PROFILE]['geolocation'] = 'plugin_geolocation_changeProfile';
+    }
 }
