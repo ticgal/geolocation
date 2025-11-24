@@ -94,12 +94,12 @@ class PluginGeolocationGeolocation extends CommonDBChild
 		if (!$item) {
 			echo "<div class='spaced'>" . __('Requested item not found') . "</div>";
 		} else {
-			$dev_ID   = $item->getField('id');
-			$options             = [];
+			$dev_ID = $item->fields['id'] ?? 0;
+			$options = [];
 			$options['colspan']  = 1;
 			$geolocation = new self();
 
-			if (!$geolocation->getFromDBByCrit(['itemtype' => $item::getType(), 'items_id' => $item->getID()])) {
+			if (!$geolocation->getFromDBByCrit(['itemtype' => $item::getType(), 'items_id' => $item->fields['id'] ?? 0])) {
 				$geolocation->getEmpty();
 				$geolocation->fields["items_id"] = $dev_ID;
 				$geolocation->fields["itemtype"] = $item::getType();
@@ -165,8 +165,8 @@ class PluginGeolocationGeolocation extends CommonDBChild
 			array_pop($criteria);
 			$globallinkto = Toolbox::append_params(
 				[
-					'criteria'     => Sanitizer::unsanitize($criteria),
-					'metacriteria' => Sanitizer::unsanitize($data['search']['metacriteria'])
+					'criteria'     => $criteria,
+					'metacriteria' => $data['search']['metacriteria']
 				],
 				'&amp;'
 			);
@@ -221,7 +221,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
 				$.ajax({
 					dataType: 'json',
 					method: 'POST',
-					url: '" . Plugin::getWebDir('geolocation') . "/ajax/map.php',
+					url: '" . $CFG_GLPI['root_doc'] . "/plugins/geolocation/ajax/map.php',
 					data: {
 						itemtype: itemtype,
 						params: " . json_encode($params) . "
@@ -487,7 +487,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
 				KEY `latitude` (`latitude`),
 				KEY `longitude` (`longitude`)
 				) ENGINE=InnoDB DEFAULT CHARSET={$default_charset} COLLATE={$default_collation} ROW_FORMAT=DYNAMIC;";
-			$DB->query($query) or die($DB->error());
+			$DB->doQuery($query) or die($DB->error());
 		}
 	}
 }

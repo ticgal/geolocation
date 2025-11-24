@@ -30,7 +30,7 @@
 include('../../../inc/includes.php');
 $plugin = new Plugin();
 if (!$plugin->isInstalled('geolocation') || !$plugin->isActivated('geolocation')) {
-	Html::displayNotFoundError();
+	die();
 }
 
 Session::checkRight('config', UPDATE);

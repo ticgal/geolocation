@@ -49,7 +49,7 @@ class PluginGeolocationProfile extends Profile
 		switch ($item->getType()) {
 			case 'Profile':
 				$profile = new self();
-				$profile->showForm($item->getID());
+				$profile->showForm($item->fields['id'] ?? 0);
 				break;
 		}
 		return true;
@@ -85,8 +85,8 @@ class PluginGeolocationProfile extends Profile
 			echo Html::hidden('id', ['value' => $profiles_id]);
 			echo Html::submit(_sx('button', 'Save'), ['name' => 'update', 'class' => 'btn btn-primary']);
 			echo "</div>\n";
-			Html::closeForm();
 		}
+		Html::closeForm();
 	}
 
 	public static function getGeneralRights()
@@ -104,6 +104,6 @@ class PluginGeolocationProfile extends Profile
 
 		$table = ProfileRight::getTable();
 		$query = "DELETE FROM $table WHERE `name` LIKE '%plugin_passwords%'";
-		$DB->query($query) or die($DB->error());
+		$DB->doQuery($query) or die($DB->error());
 	}
 }

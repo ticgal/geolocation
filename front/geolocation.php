@@ -33,7 +33,7 @@ include('../../../inc/includes.php');
 Session::checkLoginUser();
 
 if (!Session::haveRight(PluginGeolocationGeolocation::$rightname, READ)) {
-	Html::displayRightError();
+	die();
 }
 if (!isset($_GET['itemtype'])) {
 	Html::back();

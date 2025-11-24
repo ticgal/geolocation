@@ -44,17 +44,17 @@ class PluginGeolocationConfig extends CommonDBTM
 		}
 	}
 
-	static function canCreate()
-	{
-		return Session::haveRight('config', UPDATE);
-	}
-
-	static function canView()
+	public static function canView(string $interface = ''): bool
 	{
 		return Session::haveRight('config', READ);
 	}
 
-	static function canUpdate()
+	public static function canCreate(string $interface = ''): bool
+	{
+		return Session::haveRight('config', UPDATE);
+	}
+
+	public static function canUpdate(string $interface = ''): bool
 	{
 		return Session::haveRight('config', UPDATE);
 	}
@@ -76,16 +76,16 @@ class PluginGeolocationConfig extends CommonDBTM
 	}
 
 	static function getConfig($update = false)
-	{
-		static $config = null;
-		if (is_null(self::$config)) {
-			$config = new self();
-		}
-		if ($update) {
-			$config->getFromDB(1);
-		}
-		return $config;
-	}
+    {
+        static $config = null;
+        if (is_null($config)) {
+            $config = new self();
+        }
+        if ($update) {
+            $config->getFromDB(1);
+        }
+        return $config;
+    }
 
 	function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
 	{
@@ -98,12 +98,13 @@ class PluginGeolocationConfig extends CommonDBTM
 	static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
 	{
 		if ($item->getType() == 'Config') {
-			self::showConfigForm($item);
+			self::showConfigForm();
 		}
 		return true;
 	}
 
-	public static function getUsedItemtypes() {
+	public static function getUsedItemtypes()
+	{
 
 		$config = new self();
 		if (isset($config->fields["assets"]) && !is_array($config->fields["assets"])) {
@@ -132,8 +133,8 @@ class PluginGeolocationConfig extends CommonDBTM
 		$values = [];
 		foreach ($CFG_GLPI['infocom_types'] as $key => $itemtype) {
 			if ($item = getItemForItemtype($itemtype)) {
-            $values[$itemtype] = $item->getTypeName();
-         }
+				$values[$itemtype] = $item->getTypeName();
+			}
 		}
 		Dropdown::showFromArray('assets', $values, ['values' => $used, 'multiple' => true, 'width' => '100%']);
 		echo "</div>";
@@ -171,7 +172,7 @@ class PluginGeolocationConfig extends CommonDBTM
 				`assets` text,
 				PRIMARY KEY (`id`)
 				) ENGINE=InnoDB DEFAULT CHARSET={$default_charset} COLLATE={$default_collation} ROW_FORMAT=DYNAMIC;";
-			$DB->query($query) or die($DB->error());
+			$DB->doQuery($query) or die($DB->error());
 
 			$config->add([
 				'id' => 1,
