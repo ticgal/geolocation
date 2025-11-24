@@ -434,7 +434,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
         echo Html::scriptBlock($js);
     }
 
-	public static function getIcon()
+    public static function getIcon()
     {
         return "ti ti-map-2";
     }
