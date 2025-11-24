@@ -73,7 +73,7 @@ class PluginGeolocationProfile extends Profile
 
         $profile->displayRightsChoiceMatrix(
             $general_rights,
-			[
+            [
                 'canedit'       => $canedit,
                 'default_class' => 'tab_bg_2',
                 'title'         => 'Geolocation'
@@ -94,12 +94,10 @@ class PluginGeolocationProfile extends Profile
     public static function getGeneralRights()
     {
         return [
-            [
             'itemtype' => 'PluginGeolocationGeolocation',
             'label'    => __('Geolocation', 'geolocation'),
             'field'    => 'plugin_geolocation_geolocation',
-            ]
-	    ];
+        ];
     }
 
     public static function uninstall()

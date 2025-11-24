@@ -161,7 +161,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
                     'criteria'     => $criteria,
                     'metacriteria' => $data['search']['metacriteria']
                 ],
-    '&amp;'
+                '&amp;'
             );
             $sort_params = Toolbox::append_params([
                 'sort'   => $data['search']['sort'],
@@ -434,7 +434,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
         echo Html::scriptBlock($js);
     }
 
-	     static function getIcon()
+	public static function getIcon()
     {
         return "ti ti-map-2";
     }
