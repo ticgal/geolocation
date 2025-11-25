@@ -43,7 +43,7 @@ if (!isset($_POST['itemtype']) || !isset($_POST['params'])) {
     http_response_code(500);
     $result = [
         'success'   => false,
-        'message'   => __('Required argument missing!')
+        'message'   => __('Required argument missing!'),
     ];
 } else {
     $itemtype = $_POST['itemtype'];
@@ -66,8 +66,8 @@ if (!isset($_POST['itemtype']) || !isset($_POST['params'])) {
             'FROM' => PluginGeolocationGeolocation::getTable(),
             'WHERE' => [
                 'itemtype' => $itemtype,
-                'items_id' => $items_id
-            ]
+                'items_id' => $items_id,
+            ],
         ];
         $iterator = $DB->request($query);
         foreach ($iterator as $result) {
@@ -76,7 +76,7 @@ if (!isset($_POST['itemtype']) || !isset($_POST['params'])) {
                 'lng' => $result['longitude'],
                 'title' => $titles[$result['items_id']],
                 'url' => $itemtype::getFormURLWithID($result['items_id']),
-                'count' => 1
+                'count' => 1,
             ];
         }
     }

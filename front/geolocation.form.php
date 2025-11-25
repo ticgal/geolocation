@@ -37,11 +37,11 @@ if (isset($_POST['add'])) {
 
     $newID = $geo->add($_POST, false);
     Html::back();
-} else if (isset($_POST["purge"])) {
+} elseif (isset($_POST["purge"])) {
     $geo->check($_POST["id"], PURGE);
     $geo->delete($_POST, 1);
     Html::back();
-} else if (isset($_POST["update"])) {
+} elseif (isset($_POST["update"])) {
     $geo->check($_POST["id"], UPDATE);
     if (empty($_POST['latitude']) && empty($_POST['longitude'])) {
         $geo->check($_POST["id"], PURGE);

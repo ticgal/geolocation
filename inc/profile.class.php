@@ -28,6 +28,9 @@
  @since     2022
  ----------------------------------------------------------------------
 */
+
+use Glpi\Dashboard\Right;
+
 if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access directly to this file");
 }
@@ -38,66 +41,72 @@ class PluginGeolocationProfile extends Profile
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
-        switch ($item->getType()) {
+       switch ($item->getType()) {
             case 'Profile':
                 return self::createTabEntry('Geolocation');
         }
-        return '';
+        return ''; 
     }
 
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
         switch ($item->getType()) {
-            case 'Profile':
+            case Profile::class:
+                /** @var Profile $item */
                 $profile = new self();
-                $profile->showForm($item->fields['id'] ?? 0);
-                break;
+                return $profile->showProfileForm($item);
         }
-        return true;
+        return false;
     }
 
-    public function showForm($profiles_id, $options = [])
+    /**
+     * Display the profile form for AccessTransparency rights
+     * @param  Profile $profile
+     * @return bool
+     */
+    public function showProfileForm(Profile $profile)
     {
         if (!Session::haveRight("profile", READ)) {
             return false;
         }
+
         $canedit = Session::haveRight("profile", UPDATE);
 
-        $profile = new Profile();
-        $profile->getFromDB($profiles_id);
-
-        echo "<form action='" . Profile::getFormUrl() . "' method='post'>";
-        echo "<table class='tab_cadre_fixe'>";
-
-        $general_rights = self::getGeneralRights();
-
-        $profile->displayRightsChoiceMatrix(
-            $general_rights,
-            [
-                'canedit'       => $canedit,
-                'default_class' => 'tab_bg_2',
-                'title'         => 'Geolocation'
-            ]
-        );
-
-        $profile->showLegend();
+        echo "<div class='spaced'>";
         if ($canedit) {
-            echo "<div class='spaced center'>";
-            echo Html::hidden('id', ['value' => $profiles_id]);
-            echo Html::submit(_sx('button', 'Save'), ['name' => 'update', 'class' => 'btn btn-primary']);
-            echo "</div>\n";
+            echo "<form method='post' action='" . htmlspecialchars($profile::getFormURL()) . "'>";
         }
-        Html::closeForm();
+
+        $rights = self::getGeneralRights();
+
+        $matrix_options = [
+            'canedit' => $canedit,
+            'title'   => __('Geolocation', 'geolocation'),
+        ];
+
+        $profile->displayRightsChoiceMatrix($rights, $matrix_options);
+
+        if ($canedit) {
+            echo "<div class='text-center'>";
+            echo Html::hidden('id', ['value' => $profile->getID()]);
+            echo Html::submit(_sx('button', 'Save'), ['name' => 'update']);
+            echo "</div>\n";
+            Html::closeForm();
+        }
+        echo '</div>';
         return true;
     }
 
     public static function getGeneralRights()
     {
-        return [
+        $rights = [];
+        $rights[] =  [
+            'rights' => [READ   => __('Read'), UPDATE => __('Update'), CREATE => __('Create'), DELETE => __('Delete')],
             'itemtype' => 'PluginGeolocationGeolocation',
             'label'    => __('Geolocation', 'geolocation'),
             'field'    => 'plugin_geolocation_geolocation',
         ];
+        return $rights;
     }
 
     public static function uninstall()

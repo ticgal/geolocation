@@ -159,13 +159,13 @@ class PluginGeolocationGeolocation extends CommonDBChild
             $globallinkto = Toolbox::append_params(
                 [
                     'criteria'     => $criteria,
-                    'metacriteria' => $data['search']['metacriteria']
+                    'metacriteria' => $data['search']['metacriteria'],
                 ],
-                '&amp;'
+                '&amp;',
             );
             $sort_params = Toolbox::append_params([
                 'sort'   => $data['search']['sort'],
-                'order'  => $data['search']['order']
+                'order'  => $data['search']['order'],
             ], '&amp;');
             $parameters = "as_map=0&amp;" . $sort_params . '&amp;' . $globallinkto;
             if (strpos($target, '?') == false) {

@@ -47,8 +47,8 @@ function plugin_version_geolocation()
             'glpi' => [
                 'min' => PLUGIN_GEOLOCATION_MIN_GLPI,
                 'max' => PLUGIN_GEOLOCATION_MAX_GLPI,
-            ]
-        ]
+            ],
+        ],
     ];
 }
 
@@ -71,10 +71,10 @@ function plugin_init_geolocation()
         $PLUGIN_HOOKS[Hooks::POST_ITEM_FORM]['geolocation'] = 'plugin_geolocation_postitemform';
 
         $PLUGIN_HOOKS[Hooks::ITEM_ADD]['geolocation'] = [
-            'Ticket' => 'plugin_geolocation_ticket_add'
+            'Ticket' => 'plugin_geolocation_ticket_add',
         ];
         $PLUGIN_HOOKS[Hooks::PRE_ITEM_UPDATE]['geolocation'] = [
-            'Ticket' => 'plugin_geolocation_ticket_update'
+            'Ticket' => 'plugin_geolocation_ticket_update',
         ];
 
         $PLUGIN_HOOKS[Hooks::REDEFINE_MENUS]['geolocation'] = [PluginGeolocationGeolocation::class, 'geolocationRedefineMenu'];

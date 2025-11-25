@@ -180,7 +180,7 @@ class PluginGeolocationConfig extends CommonDBTM
 
             $config->add([
                 'id' => 1,
-                'assets' => exportArrayToDB([])
+                'assets' => exportArrayToDB([]),
             ]);
         }
     }
