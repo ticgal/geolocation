@@ -39,11 +39,11 @@ class PluginGeolocationProfile extends Profile
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
-       switch ($item->getType()) {
+        switch ($item->getType()) {
             case 'Profile':
                 return self::createTabEntry('Geolocation');
         }
-        return ''; 
+        return '';
     }
 
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
