@@ -176,7 +176,7 @@ class PluginGeolocationConfig extends CommonDBTM
                 `assets` text,
                 PRIMARY KEY (`id`)
                 ) ENGINE=InnoDB DEFAULT CHARSET={$default_charset} COLLATE={$default_collation} ROW_FORMAT=DYNAMIC;";
-            $DB->doQuery($query) or die($DB->error());
+            $DB->doQuery($query);
 
             $config->add([
                 'id' => 1,

@@ -29,8 +29,6 @@
  ----------------------------------------------------------------------
 */
 
-include('../../../inc/includes.php');
-
 $geo = new PluginGeolocationGeolocation();
 if (isset($_POST['add'])) {
     $geo->check(-1, CREATE, $_POST);

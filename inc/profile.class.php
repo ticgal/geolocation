@@ -29,8 +29,6 @@
  ----------------------------------------------------------------------
 */
 
-use Glpi\Dashboard\Right;
-
 if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access directly to this file");
 }
@@ -115,7 +113,7 @@ class PluginGeolocationProfile extends Profile
         global $DB;
 
         $table = ProfileRight::getTable();
-        $query = "DELETE FROM $table WHERE `name` LIKE '%plugin_passwords%'";
-        $DB->doQuery($query) or die($DB->error());
+        $query = "DELETE FROM $table WHERE `name` LIKE '%plugin_geolocation%'";
+        $DB->doQuery($query);
     }
 }

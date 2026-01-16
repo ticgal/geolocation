@@ -70,7 +70,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         if (in_array($item->getType(), PluginGeolocationConfig::getUsedItemtypes())) {
-            return self::getTypeName();
+            return self::createTabEntry(self::getTypeName());
         }
         return '';
     }
@@ -278,14 +278,14 @@ class PluginGeolocationGeolocation extends CommonDBChild
             $geolocation->getEmpty();
         }
 
-        echo "<div class='form-field row col-12 mb-2'>";
+        echo "<div class='form-field row align-items-center col-12 glpi-full-width mb-2'>";
         echo "<label class='col-form-label col-xxl-4 text-xxl-end' for='latitude'>" . __('Latitude') . "</label>";
         echo "<div class='col-xxl-8 field-container'>";
         echo "<input type='number' id='latitude' step='any' class='form-control' name='latitude' value='" . $geolocation->fields['latitude'] . "'>";
         echo "</div>";
         echo "</div>";
 
-        echo "<div class='form-field row col-12 mb-2'>";
+        echo "<div class='form-field row align-items-center col-12 glpi-full-width mb-2'>";
         echo "<label class='col-form-label col-xxl-4 text-xxl-end' for='longitude'>" . __('Longitude') . "</label>";
         echo "<div class='col-xxl-8 field-container'>";
         echo "<input type='number' id='longitude' step='any' class='form-control' name='longitude' value='" . $geolocation->fields['longitude'] . "'>";
@@ -453,7 +453,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
             $migration->displayMessage("Installing $table");
             $query = "CREATE TABLE IF NOT EXISTS $table (
                 `id` int {$default_key_sign} NOT NULL auto_increment,
-                `itemtype` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+                `itemtype` varchar(100) COLLATE {$default_collation} NOT NULL,
                 `items_id` int {$default_key_sign} NOT NULL DEFAULT '0',
                 `latitude` decimal(9,6) NOT NULL DEFAULT '0.0000',
                 `longitude` decimal(9,6) NOT NULL DEFAULT '0.0000',
@@ -462,7 +462,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
                 KEY `latitude` (`latitude`),
                 KEY `longitude` (`longitude`)
                 ) ENGINE=InnoDB DEFAULT CHARSET={$default_charset} COLLATE={$default_collation} ROW_FORMAT=DYNAMIC;";
-            $DB->doQuery($query) or die($DB->error());
+            $DB->doQuery($query);
         }
     }
 }

@@ -29,12 +29,10 @@
  ----------------------------------------------------------------------
 */
 
-include('../../../inc/includes.php');
-
 Session::checkLoginUser();
 
 if (!Session::haveRight(PluginGeolocationGeolocation::$rightname, READ)) {
-    die();
+    throw new \Glpi\Exception\Http\AccessDeniedHttpException();
 }
 if (!isset($_GET['itemtype'])) {
     Html::back();

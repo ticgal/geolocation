@@ -28,13 +28,15 @@
  @since     2022
  ----------------------------------------------------------------------
 */
-include('../../../inc/includes.php');
+
 $plugin = new Plugin();
 if (!$plugin->isInstalled('geolocation') || !$plugin->isActivated('geolocation')) {
-    die();
+    throw new \Glpi\Exception\Http\NotFoundHttpException();
 }
 
 Session::checkRight('config', UPDATE);
+
+global $CFG_GLPI;
 
 $config = new PluginGeolocationConfig();
 if (isset($_POST["update"])) {
