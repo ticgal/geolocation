@@ -1,4 +1,5 @@
 <?php
+
 /*
  -------------------------------------------------------------------------
  Geolocation plugin for GLPI
@@ -22,88 +23,97 @@
  @author    the TICgal team
  @copyright Copyright (c) 2022 TICgal team
  @license   AGPL License 3.0 or (at your option) any later version
-				http://www.gnu.org/licenses/agpl-3.0-standalone.html
+                http://www.gnu.org/licenses/agpl-3.0-standalone.html
  @link      https://www.tic.gal
  @since     2022
  ----------------------------------------------------------------------
 */
+
 if (!defined('GLPI_ROOT')) {
-	die("Sorry. You can't access directly to this file");
+    die("Sorry. You can't access directly to this file");
 }
 
 class PluginGeolocationProfile extends Profile
 {
-	static $rightname = "profile";
+    public static $rightname = "profile";
 
-	function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
-	{
-		switch ($item->getType()) {
-			case 'Profile':
-				return self::createTabEntry('Geolocation');
-				break;
-		}
-	}
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    {
+        switch ($item->getType()) {
+            case 'Profile':
+                return self::createTabEntry('Geolocation');
+        }
+        return '';
+    }
 
-	static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
-	{
-		switch ($item->getType()) {
-			case 'Profile':
-				$profile = new self();
-				$profile->showForm($item->getID());
-				break;
-		}
-		return true;
-	}
+    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+    {
+        switch ($item->getType()) {
+            case Profile::class:
+                /** @var Profile $item */
+                $profile = new self();
+                return $profile->showProfileForm($item);
+        }
+        return false;
+    }
 
-	function showForm($profiles_id, $options = [])
-	{
-		if (!Session::haveRight("profile", READ)) {
-			return false;
-		}
-		$canedit = Session::haveRight("profile", UPDATE);
+    /**
+     * Display the profile form for AccessTransparency rights
+     * @param  Profile $profile
+     * @return bool
+     */
+    public function showProfileForm(Profile $profile)
+    {
+        if (!Session::haveRight("profile", READ)) {
+            return false;
+        }
 
-		$profile = new Profile();
-		$profile->getFromDB($profiles_id);
+        $canedit = Session::haveRight("profile", UPDATE);
 
-		echo "<form action='" . Profile::getFormUrl() . "' method='post'>";
-		echo "<table class='tab_cadre_fixe'>";
+        echo "<div class='spaced'>";
+        if ($canedit) {
+            echo "<form method='post' action='" . htmlspecialchars($profile::getFormURL()) . "'>";
+        }
 
-		$general_rights = self::getGeneralRights();
+        $rights = self::getGeneralRights();
 
-		$profile->displayRightsChoiceMatrix(
-			$general_rights,
-			[
-				'canedit'       => $canedit,
-				'default_class' => 'tab_bg_2',
-				'title'         => 'Geolocation'
-			]
-		);
+        $matrix_options = [
+            'canedit' => $canedit,
+            'title'   => __('Geolocation', 'geolocation'),
+        ];
 
-		$profile->showLegend();
-		if ($canedit) {
-			echo "<div class='spaced center'>";
-			echo Html::hidden('id', ['value' => $profiles_id]);
-			echo Html::submit(_sx('button', 'Save'), ['name' => 'update', 'class' => 'btn btn-primary']);
-			echo "</div>\n";
-			Html::closeForm();
-		}
-	}
+        $profile->displayRightsChoiceMatrix($rights, $matrix_options);
 
-	public static function getGeneralRights()
-	{
-		return [[
-			'itemtype' => 'PluginGeolocationGeolocation',
-			'label'    => __('Geolocation', 'geolocation'),
-			'field'    => 'plugin_geolocation_geolocation',
-		]];
-	}
+        if ($canedit) {
+            echo "<div class='text-center'>";
+            echo Html::hidden('id', ['value' => $profile->getID()]);
+            echo Html::submit(_sx('button', 'Save'), ['name' => 'update']);
+            echo "</div>\n";
+            Html::closeForm();
+        }
+        echo '</div>';
+        return true;
+    }
 
-	static function uninstall()
-	{
-		global $DB;
+    public static function getGeneralRights()
+    {
+        $rights = [];
+        $rights[] =  [
+            'rights' => [READ   => __('Read'), UPDATE => __('Update'), CREATE => __('Create'), DELETE => __('Delete')],
+            'itemtype' => 'PluginGeolocationGeolocation',
+            'label'    => __('Geolocation', 'geolocation'),
+            'field'    => 'plugin_geolocation_geolocation',
+        ];
+        return $rights;
+    }
 
-		$table = ProfileRight::getTable();
-		$query = "DELETE FROM $table WHERE `name` LIKE '%plugin_passwords%'";
-		$DB->query($query) or die($DB->error());
-	}
+    public static function uninstall()
+    {
+        /** @var \DBmysql $DB */
+        global $DB;
+
+        $table = ProfileRight::getTable();
+        $query = "DELETE FROM $table WHERE `name` LIKE '%plugin_geolocation%'";
+        $DB->doQuery($query);
+    }
 }
