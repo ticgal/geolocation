@@ -31,7 +31,7 @@
 
 use Glpi\Plugin\Hooks;
 
-define('PLUGIN_GEOLOCATION_VERSION', '2.0.0-beta2');
+define('PLUGIN_GEOLOCATION_VERSION', '2.0.0');
 define('PLUGIN_GEOLOCATION_MIN_GLPI', '11.0.0');
 define('PLUGIN_GEOLOCATION_MAX_GLPI', '11.9');
 
