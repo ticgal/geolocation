@@ -3,7 +3,7 @@
 /*
  -------------------------------------------------------------------------
  Geolocation plugin for GLPI
- Copyright (C) 2022 by the TICgal Team.
+ Copyright (C) 2022 - 2026 by the TICGAL Team.
  https://www.tic.gal
  -------------------------------------------------------------------------
  LICENSE
@@ -20,8 +20,8 @@
  along with Geolocation. If not, see <http://www.gnu.org/licenses/>.
  --------------------------------------------------------------------------
  @package   Geolocation
- @author    the TICgal team
- @copyright Copyright (c) 2022 TICgal team
+ @author    the TICGAL team
+ @copyright Copyright (C) 2022 - 2026 TICGAL team
  @license   AGPL License 3.0 or (at your option) any later version
                 http://www.gnu.org/licenses/agpl-3.0-standalone.html
  @link      https://www.tic.gal
@@ -50,7 +50,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
     {
         if (Session::haveRight(PluginGeolocationGeolocation::$rightname, READ)) {
             if (isset($menus['helpdesk']['content']['ticket'])) {
-                $icon = "<i class='ti ti-map-2' title='" . __('Geolocation', 'geolocation') . "'></i>";
+                $icon = "<i class='" . self::getIcon() . "' title='" . __('Geolocation', 'geolocation') . "'></i>";
                 $icon .= "<span class='d-none d-xxl-block'>" . __('Geolocation', 'geolocation') . "</span>";
                 $menus['helpdesk']['content']['ticket']['links'][$icon] = self::getSearchURL(false) . "?itemtype=" . Ticket::getType();
             }
@@ -58,7 +58,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
             foreach ($listitemtypes as $key => $value) {
                 $itemtype = strtolower($value);
                 if (isset($menus['assets']['content'][$itemtype])) {
-                    $icon = "<i class='ti ti-map-2' title='" . __('Geolocation', 'geolocation') . "'></i>";
+                    $icon = "<i class='" . self::getIcon() . "' title='" . __('Geolocation', 'geolocation') . "'></i>";
                     $icon .= "<span class='d-none d-xxl-block'>" . __('Geolocation', 'geolocation') . "</span>";
                     $menus['assets']['content'][$itemtype]['links'][$icon] = self::getSearchURL(false) . "?itemtype=" . $value;
                 }
@@ -436,7 +436,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
 
     public static function getIcon()
     {
-        return "ti ti-map-2";
+        return PLUGIN_GEOLOCATION_ICON;
     }
 
     public static function install(Migration $migration)
