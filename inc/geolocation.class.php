@@ -69,6 +69,10 @@ class PluginGeolocationGeolocation extends CommonDBChild
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
+        if (!Session::haveRight(self::$rightname, READ)) {
+            return '';
+        }
+
         if (in_array($item->getType(), PluginGeolocationConfig::getUsedItemtypes())) {
             return self::createTabEntry(self::getTypeName());
         }
@@ -176,7 +180,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
             $typename = class_exists($itemtype) ? $itemtype::getTypeName($data['data']['totalcount']) : $itemtype;
 
             echo "<div class='card border-top-0 rounded-0 search-as-map'>";
-            echo "<div class='card-body px-0' id='map_container'>";
+            echo "<div class='card-body px-0 shadow-sm rounded-3' id='map_container' style='overflow:hidden; margin: 10px; border: 1px solid #ddd;'>";
             echo "<small class='text-muted p-1'>" . __('Search results for localized items only') . "</small>";
             $js = "$(function() {
                 var map = initMap($('#map_container'), 'map', 'full');
@@ -302,6 +306,18 @@ class PluginGeolocationGeolocation extends CommonDBChild
     {
         $rand = mt_rand();
 
+        echo "<style>
+            .search-as-map, #map_container, [id^='setlocation_container_'] {
+                border-radius: 12px !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+                border: 1px solid #e1e4e8 !important;
+                overflow: hidden;
+            }
+            .leaflet-container {
+                background: #f8f9fa !important;
+            }
+        </style>";
+
         echo "<div id='setlocation_container_{$rand}'></div>";
         $js = "
         $(function(){
@@ -400,7 +416,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
 
         // Geolocation may be disabled in the browser (e.g. geo.enabled = false in firefox)
         if (!navigator.geolocation) {
-            map_elt = initMap($('#setlocation_container_{$rand}'), 'setlocation_{$rand}', '200px');
+            map_elt = initMap($('#setlocation_container_{$rand}'), 'setlocation_{$rand}', '450px');
             finalizeMap();
             return;
         }
@@ -427,7 +443,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
             });
             finalizeMap();
         }, function() {
-            map_elt = initMap($('#setlocation_container_{$rand}'), 'setlocation_{$rand}', '200px');
+            map_elt = initMap($('#setlocation_container_{$rand}'), 'setlocation_{$rand}', '450px');
             finalizeMap();
         }, {enableHighAccuracy: true});
         });";
