@@ -1,9 +1,8 @@
 <root>
    <name>Geolocation</name>
    <key>geolocation</key>
-   <state>stable</state> <logo>
-      https://raw.githubusercontent.com/ticgal/geolocation/multimedia/geolocation.png
-   </logo>
+   <state>stable</state> 
+   <logo>https://raw.githubusercontent.com/ticgal/geolocation/multimedia/geolocation.png</logo>
    <description>
       <short>
          <en>Geolocation is a GLPI plugin that adds geographic coordinates to your Tickets and Assets</en>
