@@ -29,19 +29,24 @@
  ----------------------------------------------------------------------
 */
 
-$plugin = new Plugin();
-if (!$plugin->isInstalled('geolocation') || !$plugin->isActivated('geolocation')) {
-    throw new \Glpi\Exception\Http\NotFoundHttpException();
+use Glpi\Exception\Http\NotFoundHttpException;
+use GlpiPlugin\Geolocation\Config;
+
+if (!Plugin::isPluginActive('geolocation')) {
+    throw new NotFoundHttpException();
 }
 
 Session::checkRight('config', UPDATE);
+Config::checkReAuthenticationOrRedirect();
 
-global $CFG_GLPI;
-
-$config = new PluginGeolocationConfig();
+$config = new Config();
 if (isset($_POST["update"])) {
     $config->check($_POST['id'], UPDATE);
     $config->update($_POST);
     Html::back();
 }
-Html::redirect($CFG_GLPI["root_doc"] . "/front/config.form.php?forcetab=" . urlencode('PluginGeolocationConfig$1'));
+
+/** @var array $CFG_GLPI */
+global $CFG_GLPI;
+
+Html::redirect($CFG_GLPI["root_doc"] . "/front/config.form.php?forcetab=" . urlencode(Config::class . '$1'));

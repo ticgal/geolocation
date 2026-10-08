@@ -1,13 +1,27 @@
-{% if options is not defined %}
-{% set options = {} %}
-{% endif %}
+{#
+ # -------------------------------------------------------------------------
+ # Geolocation plugin for GLPI
+ # Copyright (C) 2022 - 2026 by the TICGAL Team.
+ # https://www.tic.gal
+ # -------------------------------------------------------------------------
+ # LICENSE: GPLv3+, see LICENSE file
+ # -------------------------------------------------------------------------
+ #}
+
+{% import 'components/form/fields_macros.html.twig' as fields %}
 
 {{ include('components/form/header.html.twig', {'in_twig': true, 'no_header': true}) }}
 
 <div class="row">
     <div class="row ps-4">
-
+        {{ fields.dropdownArrayField(
+            'assets',
+            '',
+            values,
+            __('Enabled itemtypes'),
+            options|merge({'multiple': true, 'values': used, 'width': '100%'})
+        ) }}
     </div>
 </div>
 
-{{ include('components/form/buttons.html.twig') }}
+{{ include('components/form/buttons.html.twig', {'params': options|merge({'candel': false})}) }}

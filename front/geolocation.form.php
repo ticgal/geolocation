@@ -29,21 +29,23 @@
  ----------------------------------------------------------------------
 */
 
-$geo = new PluginGeolocationGeolocation();
+use GlpiPlugin\Geolocation\Geolocation;
+
+$geo = new Geolocation();
 if (isset($_POST['add'])) {
     $geo->check(-1, CREATE, $_POST);
 
-    $newID = $geo->add($_POST, false);
+    $geo->add($_POST);
     Html::back();
 } elseif (isset($_POST["purge"])) {
     $geo->check($_POST["id"], PURGE);
-    $geo->delete($_POST, 1);
+    $geo->delete($_POST, true);
     Html::back();
 } elseif (isset($_POST["update"])) {
     $geo->check($_POST["id"], UPDATE);
     if (empty($_POST['latitude']) && empty($_POST['longitude'])) {
         $geo->check($_POST["id"], PURGE);
-        $geo->delete($_POST, 1);
+        $geo->delete($_POST, true);
     } else {
         $geo->update($_POST);
     }

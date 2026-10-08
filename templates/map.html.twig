@@ -1,0 +1,101 @@
+{#
+ # -------------------------------------------------------------------------
+ # Geolocation plugin for GLPI
+ # Copyright (C) 2022 - 2026 by the TICGAL Team.
+ # https://www.tic.gal
+ # -------------------------------------------------------------------------
+ # LICENSE: GPLv3+, see LICENSE file
+ # -------------------------------------------------------------------------
+ #}
+
+<div class="card border-top-0 rounded-0 search-as-map">
+    <div id="map_container" class="card-body px-0">
+        <small class="text-muted p-1">{{ __('Search results for localized items only') }}</small>
+        <script>
+            $(function() {
+                const map = initMap($('#map_container'), 'map', 'full');
+                _loadMap(map, '{{ itemtype|e('js') }}');
+            });
+            const _loadMap = function(map_elt, itemtype) {
+                L.AwesomeMarkers.Icon.prototype.options.prefix = 'far';
+                const stdMarker = L.AwesomeMarkers.icon({
+                    icon: 'circle',
+                    markerColor: 'blue'
+                });
+
+                map_elt.spin(true);
+                $.ajax({
+                    dataType: 'json',
+                    method: 'POST',
+                    url: '{{ ajax_url|e('js') }}',
+                    data: {
+                        itemtype: itemtype,
+                        params: {{ params|json_encode|raw }}
+                    }
+                }).done((data) => {
+                    const _markers = L.markerClusterGroup({
+                        iconCreateFunction: (cluster) => {
+                            const markers = cluster.getAllChildMarkers();
+                            let n = 0;
+                            for (let i = 0; i < markers.length; i++) {
+                                n += parseInt(markers[i].count);
+                            }
+
+                            let c = ' marker-cluster-';
+                            if (n < 10) {
+                                c += 'small';
+                            } else if (n < 100) {
+                                c += 'medium';
+                            } else {
+                                c += 'large';
+                            }
+
+                            return new L.DivIcon({ html: '<div><span>' + n + '</span></div>', className: 'marker-cluster' + c, iconSize: new L.Point(40, 40) });
+                        }
+                    });
+
+                    $.each(data.points, (index, point) => {
+                        const view_text = '{{ __('View item', 'geolocation')|e('js') }}';
+                        const _title = `
+                            <strong>${_.escape(point.title)}</strong><br/>
+                            <a href="${_.escape(point.url)}">${_.escape(view_text)}</a>
+                        `;
+                        const _marker = L.marker([point.lat, point.lng], { icon: stdMarker, title: point.title });
+                        _marker.count = point.count;
+                        _marker.bindPopup(_title);
+                        _markers.addLayer(_marker);
+                    });
+
+                    map_elt.addLayer(_markers);
+                    if (_markers.getLayers().length > 0) {
+                        map_elt.fitBounds(
+                            _markers.getBounds(), {
+                                padding: [50, 50],
+                                maxZoom: 12
+                            }
+                        );
+                    }
+                }).fail((response) => {
+                    let error_message = '{{ __('An error occurred loading data :(')|e('js') }}';
+                    if (response.responseJSON && response.responseJSON.message) {
+                        error_message = response.responseJSON.message;
+                    }
+                    const reload_message = '{{ __('Reload')|e('js') }}';
+                    const fail_info = L.control();
+                    fail_info.onAdd = function (map) {
+                        this._div = L.DomUtil.create('div', 'fail_info');
+                        this._div.innerHTML = `${_.escape(error_message)}<br/><span id='reload_data'><i class='ti ti-refresh' aria-hidden='true'></i>${_.escape(reload_message)}</span>`;
+                        return this._div;
+                    };
+                    fail_info.addTo(map_elt);
+                    $('#reload_data').on('click', () => {
+                        $('.fail_info').remove();
+                        _loadMap(map_elt, itemtype);
+                    });
+                }).always(() => {
+                    map_elt.spin(false);
+                });
+            };
+        </script>
+    </div>
+</div>
