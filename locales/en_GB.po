@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Geolocation\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-23 11:44+0200\n"
+"POT-Creation-Date: 2026-10-08 17:04+0200\n"
 "Language: en_GB\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -10,12 +10,28 @@ msgstr ""
 "X-Generator: Localazy (https://localazy.com)\n"
 "Plural-Forms: nplurals=2; plural=(n==1) ? 0 : 1;\n"
 
-#: inc/geolocation.class.php:54 inc/geolocation.class.php:55
-#: inc/geolocation.class.php:62 inc/geolocation.class.php:63
-#: inc/profile.class.php:96
+#: inc/profile.class.php:82 inc/profile.class.php:104
+#: inc/geolocation.class.php:134 inc/geolocation.class.php:135
+#: inc/geolocation.class.php:142 inc/geolocation.class.php:143
 msgid "Geolocation"
 msgstr "Geolocation"
 
-#: inc/geolocation.class.php:251
+#: inc/geolocation.class.php:68
+msgid "Geolocation is not enabled for this type of item"
+msgstr "Geolocation is not enabled for this type of item"
+
+#: inc/geolocation.class.php:80
+msgid "This item already has a geolocation"
+msgstr "This item already has a geolocation"
+
+#: inc/geolocation.class.php:98
+msgid "A geolocation cannot be moved to another item"
+msgstr "A geolocation cannot be moved to another item"
+
+#: inc/geolocation.class.php:120
+msgid "Invalid latitude or longitude"
+msgstr "Invalid latitude or longitude"
+
+#: inc/geolocation.class.php:309
 msgid "View item"
 msgstr "View item"

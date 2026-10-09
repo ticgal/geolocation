@@ -1,15 +1,15 @@
-# GEOLOCATION Glpi Plugin.
-# Copyright (C) 2023 TICGAL
+# geolocation Glpi Plugin.
+# Copyright (C) 2026 TICGAL
 # This file is distributed under the same license as the PACKAGE package.
-# TICGAL, 2023
+# TICGAL, 2026
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-23 11:44+0200\n"
-"PO-Revision-Date: 2023-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2026-10-08 17:04+0200\n"
+"PO-Revision-Date: 2026-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -17,12 +17,28 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: inc/geolocation.class.php:54 inc/geolocation.class.php:55
-#: inc/geolocation.class.php:62 inc/geolocation.class.php:63
-#: inc/profile.class.php:96
+#: inc/profile.class.php:82 inc/profile.class.php:104
+#: inc/geolocation.class.php:134 inc/geolocation.class.php:135
+#: inc/geolocation.class.php:142 inc/geolocation.class.php:143
 msgid "Geolocation"
 msgstr ""
 
-#: inc/geolocation.class.php:251
+#: inc/geolocation.class.php:68
+msgid "Geolocation is not enabled for this type of item"
+msgstr ""
+
+#: inc/geolocation.class.php:80
+msgid "This item already has a geolocation"
+msgstr ""
+
+#: inc/geolocation.class.php:98
+msgid "A geolocation cannot be moved to another item"
+msgstr ""
+
+#: inc/geolocation.class.php:120
+msgid "Invalid latitude or longitude"
+msgstr ""
+
+#: inc/geolocation.class.php:309
 msgid "View item"
 msgstr ""

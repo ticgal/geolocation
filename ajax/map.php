@@ -29,7 +29,7 @@ along with Geolocation. If not, see <http://www.gnu.org/licenses/>.
 ----------------------------------------------------------------------
 */
 
-header("Content-Type: text/html; charset=UTF-8");
+header("Content-Type: application/json; charset=UTF-8");
 Html::header_nocache();
 
 Session::checkLoginUser();
@@ -37,48 +37,57 @@ Session::checkLoginUser();
 /** @var \DBmysql $DB */
 global $DB;
 
-$result = [];
-if (!isset($_POST['itemtype']) || !isset($_POST['params'])) {
-    http_response_code(500);
-    $result = [
+$itemtype = $_POST['itemtype'] ?? null;
+$params   = $_POST['params'] ?? null;
+
+if (!is_string($itemtype) || !is_array($params)) {
+    http_response_code(400);
+    echo json_encode([
         'success'   => false,
         'message'   => __('Required argument missing!'),
-    ];
-} else {
-    $itemtype = $_POST['itemtype'];
-    $params   = $_POST['params'];
-
-    $data = Search::prepareDatasForSearch($itemtype, $params);
-    Search::constructSQL($data);
-    Search::constructData($data);
-
-    $rows = $data['data']['rows'];
-    $items_id = [];
-    $titles = [];
-    foreach ($rows as $row) {
-        $items_id[] = $row['raw']['id'];
-        $titles[$row['raw']['id']] = $row['raw']["ITEM_" . $itemtype . "_1"];
-    }
-    $points = [];
-    if (count($items_id) > 0) {
-        $query = [
-            'FROM' => PluginGeolocationGeolocation::getTable(),
-            'WHERE' => [
-                'itemtype' => $itemtype,
-                'items_id' => $items_id,
-            ],
-        ];
-        $iterator = $DB->request($query);
-        foreach ($iterator as $result) {
-            $points[$result['id']] = [
-                'lat' => $result['latitude'],
-                'lng' => $result['longitude'],
-                'title' => $titles[$result['items_id']],
-                'url' => $itemtype::getFormURLWithID($result['items_id']),
-                'count' => 1,
-            ];
-        }
-    }
-    $result['points'] = $points;
+    ]);
+    return;
 }
-echo json_encode($result);
+
+if (
+    !in_array($itemtype, PluginGeolocationGeolocation::getAllowedItemtypes(), true)
+    || !Session::haveRight(PluginGeolocationGeolocation::$rightname, READ)
+    || !$itemtype::canView()
+) {
+    http_response_code(403);
+    echo json_encode([
+        'success'   => false,
+        'message'   => __('You don\'t have permission to perform this action.'),
+    ]);
+    return;
+}
+
+$data = Search::prepareDatasForSearch($itemtype, $params);
+Search::constructSQL($data);
+Search::constructData($data);
+
+$titles = [];
+foreach ($data['data']['rows'] as $row) {
+    $titles[$row['raw']['id']] = $row['raw']["ITEM_" . $itemtype . "_1"] ?? '';
+}
+
+$points = [];
+if (count($titles) > 0) {
+    $iterator = $DB->request([
+        'FROM' => PluginGeolocationGeolocation::getTable(),
+        'WHERE' => [
+            'itemtype' => $itemtype,
+            'items_id' => array_keys($titles),
+        ],
+    ]);
+    foreach ($iterator as $geolocation) {
+        $points[$geolocation['id']] = [
+            'lat' => $geolocation['latitude'],
+            'lng' => $geolocation['longitude'],
+            'title' => $titles[$geolocation['items_id']],
+            'url' => $itemtype::getFormURLWithID($geolocation['items_id']),
+            'count' => 1,
+        ];
+    }
+}
+echo json_encode(['points' => $points]);

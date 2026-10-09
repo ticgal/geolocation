@@ -46,6 +46,87 @@ class PluginGeolocationGeolocation extends CommonDBChild
         return 'Geolocation';
     }
 
+    /**
+     * Itemtypes whose geolocations can be displayed: tickets and the itemtypes enabled in the plugin settings.
+     *
+     * @return string[]
+     */
+    public static function getAllowedItemtypes(): array
+    {
+        $used = PluginGeolocationConfig::getUsedItemtypes();
+        $used = is_array($used) ? array_filter($used, 'is_string') : [];
+        return array_values(array_unique(array_merge([Ticket::class], $used)));
+    }
+
+    public function prepareInputForAdd($input)
+    {
+        if (!$this->checkCoordinates($input)) {
+            return false;
+        }
+        if (!in_array($input['itemtype'] ?? null, self::getAllowedItemtypes(), true)) {
+            Session::addMessageAfterRedirect(
+                __s('Geolocation is not enabled for this type of item', 'geolocation'),
+                false,
+                ERROR,
+            );
+            return false;
+        }
+        // Only one geolocation per item (unicity key)
+        if (
+            isset($input['items_id'])
+            && countElementsInTable(self::getTable(), ['itemtype' => $input['itemtype'], 'items_id' => $input['items_id']]) > 0
+        ) {
+            Session::addMessageAfterRedirect(
+                __s('This item already has a geolocation', 'geolocation'),
+                false,
+                ERROR,
+            );
+            return false;
+        }
+        return parent::prepareInputForAdd($input);
+    }
+
+    public function prepareInputForUpdate($input)
+    {
+        if (!$this->checkCoordinates($input)) {
+            return false;
+        }
+        // A geolocation belongs to its item: it cannot be moved to another one
+        foreach ([static::$itemtype, static::$items_id] as $field) {
+            if (array_key_exists($field, $input) && $input[$field] != ($this->fields[$field] ?? null)) {
+                Session::addMessageAfterRedirect(
+                    __s('A geolocation cannot be moved to another item', 'geolocation'),
+                    false,
+                    ERROR,
+                );
+                return false;
+            }
+        }
+        return parent::prepareInputForUpdate($input);
+    }
+
+    /**
+     * Latitude and longitude, when present, must be numbers within their range.
+     */
+    private function checkCoordinates(array $input): bool
+    {
+        $limits = ['latitude' => 90, 'longitude' => 180];
+        foreach ($limits as $field => $limit) {
+            if (!array_key_exists($field, $input)) {
+                continue;
+            }
+            if (!is_numeric($input[$field]) || abs((float) $input[$field]) > $limit) {
+                Session::addMessageAfterRedirect(
+                    __s('Invalid latitude or longitude', 'geolocation'),
+                    false,
+                    ERROR,
+                );
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static function geolocationRedefineMenu($menus)
     {
         if (Session::haveRight(PluginGeolocationGeolocation::$rightname, READ)) {
@@ -180,7 +261,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
             echo "<small class='text-muted p-1'>" . __('Search results for localized items only') . "</small>";
             $js = "$(function() {
                 var map = initMap($('#map_container'), 'map', 'full');
-                _loadMap(map, '$itemtype');
+                _loadMap(map, " . json_encode($itemtype) . ");
             });
             var _loadMap = function(map_elt, itemtype) {
                 L.AwesomeMarkers.Icon.prototype.options.prefix = 'far';
@@ -225,7 +306,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
                         }
                    });
                     $.each(_points, function(index, point) {
-                        var _title = '<strong>' + point.title + '</strong><br/><a href=\'' + point.url + '\'>" . __('View item', 'geolocation') . "</a>';
+                        var _title = '<strong>' + _.escape(point.title) + '</strong><br/><a href=\'' + _.escape(point.url) + '\'>" . __s('View item', 'geolocation') . "</a>';
                         var _icon = stdMarker;
                         var _marker = L.marker([point.lat, point.lng], { icon: _icon, title: point.title });
                         _marker.count = point.count;
@@ -242,8 +323,8 @@ class PluginGeolocationGeolocation extends CommonDBChild
                 }).fail(function (response) {
                     var _data = response.responseJSON;
                     var _message = '" . __s('An error occurred loading data :(') . "';
-                    if (_data.message) {
-                        _message = _data.message;
+                    if (_data && _data.message) {
+                        _message = _.escape(_data.message);
                     }
                     var fail_info = L.control();
                     fail_info.onAdd = function (map) {
@@ -254,7 +335,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
                     fail_info.addTo(map_elt);
                     $('#reload_data').on('click', function() {
                         $('.fail_info').remove();
-                        _loadMap(map_elt);
+                        _loadMap(map_elt, itemtype);
                     });
                 }).always(function() {
                     //hide spinner
