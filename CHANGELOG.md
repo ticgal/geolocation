@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - GLPI 12 compatibility
 ### Security
+- Includes the security fixes from 2.0.1
 - Saving a ticket only changes its geolocation when the user can modify that ticket. Users who could only see it, such as observers, could change or remove it
 - Geolocations can only be added to tickets and the itemtypes enabled in the settings, and cannot be moved to another item
 - The map page and its data endpoint only accept tickets and the itemtypes enabled in the settings, and check the read right on that itemtype
