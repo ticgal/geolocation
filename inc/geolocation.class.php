@@ -174,16 +174,16 @@ class PluginGeolocationGeolocation extends CommonDBChild
     {
         if (Session::haveRight(PluginGeolocationGeolocation::$rightname, READ)) {
             if (isset($menus['helpdesk']['content']['ticket'])) {
-                $icon = "<i class='" . self::getIcon() . "' title='" . __('Geolocation', 'geolocation') . "'></i>";
-                $icon .= "<span class='d-none d-xxl-block'>" . __('Geolocation', 'geolocation') . "</span>";
+                $icon = "<i class='" . self::getIcon() . "' title='" . __s('Geolocation', 'geolocation') . "'></i>";
+                $icon .= "<span class='d-none d-xxl-block'>" . __s('Geolocation', 'geolocation') . "</span>";
                 $menus['helpdesk']['content']['ticket']['links'][$icon] = self::getSearchURL(false) . "?itemtype=" . Ticket::getType();
             }
             $listitemtypes = PluginGeolocationConfig::getUsedItemtypes();
             foreach ($listitemtypes as $key => $value) {
                 $itemtype = strtolower($value);
                 if (isset($menus['assets']['content'][$itemtype])) {
-                    $icon = "<i class='" . self::getIcon() . "' title='" . __('Geolocation', 'geolocation') . "'></i>";
-                    $icon .= "<span class='d-none d-xxl-block'>" . __('Geolocation', 'geolocation') . "</span>";
+                    $icon = "<i class='" . self::getIcon() . "' title='" . __s('Geolocation', 'geolocation') . "'></i>";
+                    $icon .= "<span class='d-none d-xxl-block'>" . __s('Geolocation', 'geolocation') . "</span>";
                     $menus['assets']['content'][$itemtype]['links'][$icon] = self::getSearchURL(false) . "?itemtype=" . $value;
                 }
             }
@@ -214,7 +214,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
         }
 
         if (!$item) {
-            echo "<div class='spaced'>" . __('Requested item not found') . "</div>";
+            echo "<div class='spaced'>" . __s('Requested item not found') . "</div>";
         } else {
             $dev_ID = $item->fields['id'] ?? 0;
             $options = [];
@@ -234,15 +234,15 @@ class PluginGeolocationGeolocation extends CommonDBChild
             echo "<div class='form-field row col-12 mb-2'>";
             echo "<div class='form-field col-sm-6 col-12 mb-2'>";
             echo "<div class='form-field row col-12 mb-2'>";
-            echo "<label class='col-form-label col-xxl-4 text-xxl-end' for='latitude'>" . __('Latitude') . "</label>";
+            echo "<label class='col-form-label col-xxl-4 text-xxl-end' for='latitude'>" . __s('Latitude') . "</label>";
             echo "<div class='col-xxl-8 field-container'>";
-            echo "<input type='number' id='latitude' step='any' class='form-control' name='latitude' value='" . $geolocation->fields['latitude'] . "'>";
+            echo "<input type='number' id='latitude' step='any' class='form-control' name='latitude' value='" . htmlescape((string) $geolocation->fields['latitude']) . "'>";
             echo "</div>";
             echo "</div>";
             echo "<div class='form-field row col-12 mb-2'>";
-            echo "<label class='col-form-label col-xxl-4 text-xxl-end' for='longitude'>" . __('Longitude') . "</label>";
+            echo "<label class='col-form-label col-xxl-4 text-xxl-end' for='longitude'>" . __s('Longitude') . "</label>";
             echo "<div class='col-xxl-8 field-container'>";
-            echo "<input type='number' id='longitude' step='any' class='form-control' name='longitude' value='" . $geolocation->fields['longitude'] . "'>";
+            echo "<input type='number' id='longitude' step='any' class='form-control' name='longitude' value='" . htmlescape((string) $geolocation->fields['longitude']) . "'>";
             echo "</div>";
             echo "</div>";
 
@@ -301,10 +301,10 @@ class PluginGeolocationGeolocation extends CommonDBChild
 
             echo "<div class='card border-top-0 rounded-0 search-as-map'>";
             echo "<div class='card-body px-0' id='map_container'>";
-            echo "<small class='text-muted p-1'>" . __('Search results for localized items only') . "</small>";
+            echo "<small class='text-muted p-1'>" . __s('Search results for localized items only') . "</small>";
             $js = "$(function() {
                 var map = initMap($('#map_container'), 'map', 'full');
-                _loadMap(map, " . json_encode($itemtype) . ");
+                _loadMap(map, " . self::jsValue($itemtype) . ");
             });
             var _loadMap = function(map_elt, itemtype) {
                 L.AwesomeMarkers.Icon.prototype.options.prefix = 'far';
@@ -322,10 +322,10 @@ class PluginGeolocationGeolocation extends CommonDBChild
                 $.ajax({
                     dataType: 'json',
                     method: 'POST',
-                    url: '" . $CFG_GLPI['root_doc'] . "/plugins/geolocation/ajax/map.php',
+                    url: " . self::jsValue($CFG_GLPI['root_doc'] . '/plugins/geolocation/ajax/map.php') . ",
                     data: {
                         itemtype: itemtype,
-                        params: " . json_encode($params) . "
+                        params: " . self::jsValue($params) . "
                     }
                 }).done(function(data) {
                     var _points = data.points;
@@ -349,7 +349,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
                         }
                    });
                     $.each(_points, function(index, point) {
-                        var _title = '<strong>' + _.escape(point.title) + '</strong><br/><a href=\'' + _.escape(point.url) + '\'>" . __s('View item', 'geolocation') . "</a>';
+                        var _title = '<strong>' + _.escape(point.title) + '</strong><br/><a href=\'' + _.escape(point.url) + '\'>' + " . self::jsValue(__s('View item', 'geolocation')) . " + '</a>';
                         var _icon = stdMarker;
                         var _marker = L.marker([point.lat, point.lng], { icon: _icon, title: point.title });
                         _marker.count = point.count;
@@ -365,14 +365,14 @@ class PluginGeolocationGeolocation extends CommonDBChild
                     );
                 }).fail(function (response) {
                     var _data = response.responseJSON;
-                    var _message = '" . __s('An error occurred loading data :(') . "';
+                    var _message = " . self::jsValue(__s('An error occurred loading data :(')) . ";
                     if (_data && _data.message) {
                         _message = _.escape(_data.message);
                     }
                     var fail_info = L.control();
                     fail_info.onAdd = function (map) {
                         this._div = L.DomUtil.create('div', 'fail_info');
-                        this._div.innerHTML = _message + '<br/><span id=\'reload_data\'><i class=\'fa fa-sync\'></i> " . __s('Reload') . "</span>';
+                        this._div.innerHTML = _message + '<br/><span id=\'reload_data\'><i class=\'fa fa-sync\'></i> ' + " . self::jsValue(__s('Reload')) . " + '</span>';
                         return this._div;
                     };
                     fail_info.addTo(map_elt);
@@ -403,16 +403,16 @@ class PluginGeolocationGeolocation extends CommonDBChild
         }
 
         echo "<div class='form-field row align-items-center col-12 glpi-full-width mb-2'>";
-        echo "<label class='col-form-label col-xxl-4 text-xxl-end' for='latitude'>" . __('Latitude') . "</label>";
+        echo "<label class='col-form-label col-xxl-4 text-xxl-end' for='latitude'>" . __s('Latitude') . "</label>";
         echo "<div class='col-xxl-8 field-container'>";
-        echo "<input type='number' id='latitude' step='any' class='form-control' name='latitude' value='" . $geolocation->fields['latitude'] . "'>";
+        echo "<input type='number' id='latitude' step='any' class='form-control' name='latitude' value='" . htmlescape((string) $geolocation->fields['latitude']) . "'>";
         echo "</div>";
         echo "</div>";
 
         echo "<div class='form-field row align-items-center col-12 glpi-full-width mb-2'>";
-        echo "<label class='col-form-label col-xxl-4 text-xxl-end' for='longitude'>" . __('Longitude') . "</label>";
+        echo "<label class='col-form-label col-xxl-4 text-xxl-end' for='longitude'>" . __s('Longitude') . "</label>";
         echo "<div class='col-xxl-8 field-container'>";
-        echo "<input type='number' id='longitude' step='any' class='form-control' name='longitude' value='" . $geolocation->fields['longitude'] . "'>";
+        echo "<input type='number' id='longitude' step='any' class='form-control' name='longitude' value='" . htmlescape((string) $geolocation->fields['longitude']) . "'>";
         echo "</div>";
         echo "</div>";
 
@@ -469,8 +469,8 @@ class PluginGeolocationGeolocation extends CommonDBChild
         var finalizeMap = function() {
             var geocoder = L.Control.geocoder({
                 defaultMarkGeocode: false,
-                errorMessage: '" . __s('No result found') . "',
-                placeholder: '" . __s('Search') . "'
+                errorMessage: " . self::jsValue(__s('No result found')) . ",
+                placeholder: " . self::jsValue(__('Search')) . "
             });
             geocoder.on('markgeocode', function(e) {
                 this._map.fitBounds(e.geocode.bbox);
@@ -495,7 +495,7 @@ class PluginGeolocationGeolocation extends CommonDBChild
                var _clat = _popup._latlng.lat.toString();
                var _clng = _popup._latlng.lng.toString();
 
-               _popup.setContent('<p><a href=\'#\'>" . __s('Set location here') . "</a></p>');
+               _popup.setContent('<p><a href=\'#\'>' + " . self::jsValue(__s('Set location here')) . " + '</a></p>');
 
                $(_container).find('a').on('click', function(e){
                   e.preventDefault();
@@ -563,6 +563,14 @@ class PluginGeolocationGeolocation extends CommonDBChild
         return PLUGIN_GEOLOCATION_ICON;
     }
 
+    /**
+     * Encode a value as a JavaScript literal that is safe inside an inline <script>.
+     */
+    private static function jsValue(mixed $value): string
+    {
+        return json_encode($value, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+    }
+
     public static function install(Migration $migration)
     {
         /** @var \DBmysql $DB */
@@ -588,5 +596,20 @@ class PluginGeolocationGeolocation extends CommonDBChild
                 ) ENGINE=InnoDB DEFAULT CHARSET={$default_charset} COLLATE={$default_collation} ROW_FORMAT=DYNAMIC;";
             $DB->doQuery($query);
         }
+    }
+
+    public static function uninstall(Migration $migration)
+    {
+        /** @var \DBmysql $DB */
+        global $DB;
+
+        // Coordinates may locate people: drop them and their history, a reinstall must not reattach them
+        $DB->delete(Log::getTable(), [
+            'OR' => [
+                'itemtype'      => self::class,
+                'itemtype_link' => self::class,
+            ],
+        ]);
+        $migration->dropTable(self::getTable());
     }
 }

@@ -1,7 +1,4 @@
 {
-	"require": {
-		"chillerlan/php-qrcode":"*"
-	},
 	"require-dev": {
         "friendsofphp/php-cs-fixer": "^3.75",
         "friendsoftwig/twigcs": "^6.1",
@@ -22,13 +19,9 @@
             "phpstan/extension-installer": true
         }
     },
-    "autoload": {
-        "psr-4": {
-            "CustomPHPStanRules\\": "tools/phpstan/rules/"
-        }
-    },
     "autoload-dev": {
         "psr-4": {
+            "CustomPHPStanRules\\": "tools/phpstan/rules/",
             "Glpi\\Tools\\": "../../tools/src/"
         }
     }
