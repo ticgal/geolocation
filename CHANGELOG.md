@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The map page only accepts tickets and the itemtypes enabled in the settings, and checks the read right on that itemtype
 - Saving a ticket only changes its geolocation when the user can modify that ticket
 - Geolocations can only be added to tickets and the itemtypes enabled in the settings, and cannot be moved to another item
+- Self-service profiles get their own right, "Geolocation of my tickets", instead of the central one: they only see and set the geolocation of their own tickets. The central right granted to self-service profiles is moved to the new right on upgrade
 ### Fixed
 - Latitude and longitude are validated, invalid values no longer cause a database error
 - Adding a second geolocation to the same item no longer causes a database error

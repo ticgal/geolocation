@@ -41,20 +41,63 @@ class PluginGeolocationGeolocation extends CommonDBChild
     public $dohistory              = true;
     public static $rightname = "plugin_geolocation_geolocation";
 
+    /**
+     * Right of the simplified interface: geolocation of the user's own tickets only.
+     * It is listed in Profile::$helpdesk_rights (see setup.php), the central right is not.
+     */
+    public const HELPDESK_RIGHTNAME = 'plugin_geolocation_helpdesk';
+
     public static function getTypeName($nb = 0)
     {
         return 'Geolocation';
     }
 
     /**
+     * Right checked for the current interface.
+     */
+    public static function getInterfaceRightname(): string
+    {
+        return Session::getCurrentInterface() === 'helpdesk' ? self::HELPDESK_RIGHTNAME : self::$rightname;
+    }
+
+    public static function canView(): bool
+    {
+        return Session::haveRight(self::getInterfaceRightname(), READ) && static::canChild('canView');
+    }
+
+    public static function canCreate(): bool
+    {
+        return Session::haveRight(self::getInterfaceRightname(), CREATE) && static::canChild('canUpdate');
+    }
+
+    public static function canUpdate(): bool
+    {
+        return Session::haveRight(self::getInterfaceRightname(), UPDATE) && static::canChild('canUpdate');
+    }
+
+    public static function canDelete(): bool
+    {
+        return Session::haveRight(self::getInterfaceRightname(), DELETE) && static::canChild('canUpdate');
+    }
+
+    public static function canPurge(): bool
+    {
+        return Session::haveRight(self::getInterfaceRightname(), PURGE) && static::canChild('canUpdate');
+    }
+
+    /**
      * Itemtypes whose geolocations can be displayed: tickets and the itemtypes enabled in the plugin settings.
+     * The simplified interface only handles tickets.
      *
      * @return string[]
      */
     public static function getAllowedItemtypes(): array
     {
+        if (Session::getCurrentInterface() === 'helpdesk') {
+            return [Ticket::class];
+        }
         $used = PluginGeolocationConfig::getUsedItemtypes();
-        $used = is_array($used) ? array_filter($used, 'is_string') : [];
+        $used = is_array($used) ? array_filter($used, fn($itemtype) => is_string($itemtype) && is_a($itemtype, CommonDBTM::class, true)) : [];
         return array_values(array_unique(array_merge([Ticket::class], $used)));
     }
 

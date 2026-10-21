@@ -58,7 +58,8 @@ class PluginGeolocationProfile extends Profile
     }
 
     /**
-     * Display the profile form for AccessTransparency rights
+     * Display the profile form for Geolocation rights: a self-service profile only gets the
+     * dedicated helpdesk right, a central profile only the central one.
      * @param  Profile $profile
      * @return bool
      */
@@ -75,7 +76,11 @@ class PluginGeolocationProfile extends Profile
             echo "<form method='post' action='" . htmlspecialchars($profile::getFormURL()) . "'>";
         }
 
-        $rights = self::getGeneralRights();
+        if (($profile->fields['interface'] ?? '') === 'helpdesk') {
+            $rights = self::getHelpdeskRights();
+        } else {
+            $rights = self::getGeneralRights();
+        }
 
         $matrix_options = [
             'canedit' => $canedit,
@@ -105,6 +110,60 @@ class PluginGeolocationProfile extends Profile
             'field'    => 'plugin_geolocation_geolocation',
         ];
         return $rights;
+    }
+
+    public static function getHelpdeskRights()
+    {
+        return [
+            [
+                'rights' => [READ => __('Read'), CREATE => __('Create'), UPDATE => __('Update'), PURGE => _x('button', 'Delete permanently')],
+                'itemtype' => 'PluginGeolocationGeolocation',
+                'label'    => __('Geolocation of my tickets', 'geolocation'),
+                'field'    => PluginGeolocationGeolocation::HELPDESK_RIGHTNAME,
+            ],
+        ];
+    }
+
+    public static function install(Migration $migration)
+    {
+        /** @var \DBmysql $DB */
+        global $DB;
+
+        $helpdesk_right = PluginGeolocationGeolocation::HELPDESK_RIGHTNAME;
+        if (countElementsInTable(ProfileRight::getTable(), ['name' => $helpdesk_right]) > 0) {
+            return;
+        }
+        $migration->displayMessage("Adding right $helpdesk_right");
+        ProfileRight::addProfileRights([$helpdesk_right]);
+
+        // Up to 2.0.0 self-service profiles used the central right: move it to the dedicated one
+        $iterator = $DB->request([
+            'SELECT'     => [ProfileRight::getTable() . '.profiles_id', ProfileRight::getTable() . '.rights'],
+            'FROM'       => ProfileRight::getTable(),
+            'INNER JOIN' => [
+                Profile::getTable() => [
+                    'ON' => [
+                        Profile::getTable()      => 'id',
+                        ProfileRight::getTable() => 'profiles_id',
+                    ],
+                ],
+            ],
+            'WHERE'      => [
+                ProfileRight::getTable() . '.name'   => PluginGeolocationGeolocation::$rightname,
+                ProfileRight::getTable() . '.rights' => ['>', 0],
+                Profile::getTable() . '.interface'   => 'helpdesk',
+            ],
+        ]);
+        foreach ($iterator as $row) {
+            $rights = $row['rights'] & (READ | CREATE | UPDATE);
+            if ($row['rights'] & DELETE) {
+                $rights |= PURGE;
+            }
+            ProfileRight::updateProfileRights($row['profiles_id'], [
+                $helpdesk_right                          => $rights,
+                PluginGeolocationGeolocation::$rightname => 0,
+            ]);
+        }
     }
 
     public static function uninstall()

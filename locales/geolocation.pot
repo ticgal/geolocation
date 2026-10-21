@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-08 17:04+0200\n"
+"POT-Creation-Date: 2026-10-21 12:45+0200\n"
 "PO-Revision-Date: 2026-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,28 +17,32 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: inc/profile.class.php:82 inc/profile.class.php:104
-#: inc/geolocation.class.php:134 inc/geolocation.class.php:135
-#: inc/geolocation.class.php:142 inc/geolocation.class.php:143
+#: inc/profile.class.php:87 inc/profile.class.php:109
+#: inc/geolocation.class.php:177 inc/geolocation.class.php:178
+#: inc/geolocation.class.php:185 inc/geolocation.class.php:186
 msgid "Geolocation"
 msgstr ""
 
-#: inc/geolocation.class.php:68
+#: inc/profile.class.php:121
+msgid "Geolocation of my tickets"
+msgstr ""
+
+#: inc/geolocation.class.php:111
 msgid "Geolocation is not enabled for this type of item"
 msgstr ""
 
-#: inc/geolocation.class.php:80
+#: inc/geolocation.class.php:123
 msgid "This item already has a geolocation"
 msgstr ""
 
-#: inc/geolocation.class.php:98
+#: inc/geolocation.class.php:141
 msgid "A geolocation cannot be moved to another item"
 msgstr ""
 
-#: inc/geolocation.class.php:120
+#: inc/geolocation.class.php:163
 msgid "Invalid latitude or longitude"
 msgstr ""
 
-#: inc/geolocation.class.php:309
+#: inc/geolocation.class.php:352
 msgid "View item"
 msgstr ""
