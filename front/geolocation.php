@@ -29,21 +29,29 @@
  ----------------------------------------------------------------------
 */
 
+use Glpi\Exception\Http\AccessDeniedHttpException;
+use Glpi\Exception\Http\BadRequestHttpException;
+
 Session::checkLoginUser();
 
 if (!Session::haveRight(PluginGeolocationGeolocation::$rightname, READ)) {
-    throw new \Glpi\Exception\Http\AccessDeniedHttpException();
+    throw new AccessDeniedHttpException();
 }
-if (!isset($_GET['itemtype'])) {
-    Html::back();
+
+$itemtype = $_GET['itemtype'] ?? null;
+if (!is_string($itemtype) || !in_array($itemtype, PluginGeolocationGeolocation::getAllowedItemtypes(), true)) {
+    throw new BadRequestHttpException();
+}
+if (!$itemtype::canView()) {
+    throw new AccessDeniedHttpException();
 }
 
 $menu = 'assets';
-if (getItemForItemtype($_GET['itemtype']) instanceof CommonITILObject) {
+if (is_a($itemtype, CommonITILObject::class, true)) {
     $menu = 'helpdesk';
 }
-Html::header($_GET['itemtype']::getTypeName(Session::getPluralNumber()), '', $menu, $_GET['itemtype']::getType());
+Html::header($itemtype::getTypeName(Session::getPluralNumber()), '', $menu, $itemtype);
 
-PluginGeolocationGeolocation::show($_GET['itemtype']);
+PluginGeolocationGeolocation::show($itemtype);
 
 Html::footer();

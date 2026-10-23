@@ -189,4 +189,9 @@ class PluginGeolocationConfig extends CommonDBTM
             ]);
         }
     }
+
+    public static function uninstall(Migration $migration)
+    {
+        $migration->dropTable(self::getTable());
+    }
 }

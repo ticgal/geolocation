@@ -31,7 +31,7 @@
 
 use Glpi\Plugin\Hooks;
 
-define('PLUGIN_GEOLOCATION_VERSION', '2.0.0');
+define('PLUGIN_GEOLOCATION_VERSION', '2.0.1');
 define('PLUGIN_GEOLOCATION_MIN_GLPI', '11.0.0');
 define('PLUGIN_GEOLOCATION_MAX_GLPI', '11.9');
 define('PLUGIN_GEOLOCATION_ICON', 'ti ti-pinned');
@@ -65,6 +65,11 @@ function plugin_init_geolocation()
 
         Plugin::registerClass('PluginGeolocationProfile', ['addtabon' => 'Profile']);
 
+        // Self-service users only get the dedicated right; Profile::cleanProfile() strips every other one
+        if (!in_array(PluginGeolocationGeolocation::HELPDESK_RIGHTNAME, Profile::$helpdesk_rights, true)) {
+            Profile::$helpdesk_rights[] = PluginGeolocationGeolocation::HELPDESK_RIGHTNAME;
+        }
+
         Plugin::registerClass('PluginGeolocationGeolocation', ['addtabon' => PluginGeolocationConfig::getUsedItemtypes()]);
 
         $PLUGIN_HOOKS[Hooks::POST_ITEM_FORM]['geolocation'] = 'plugin_geolocation_postitemform';
@@ -77,7 +82,5 @@ function plugin_init_geolocation()
         ];
 
         $PLUGIN_HOOKS[Hooks::REDEFINE_MENUS]['geolocation'] = [PluginGeolocationGeolocation::class, 'geolocationRedefineMenu'];
-
-        $PLUGIN_HOOKS[Hooks::CHANGE_PROFILE]['geolocation'] = 'plugin_geolocation_changeProfile';
     }
 }

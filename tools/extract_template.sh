@@ -29,12 +29,12 @@ rm -f $LOCALES/$POTFILE && touch $LOCALES/$POTFILE >/dev/null
 echo Searching PHP files...
 # Append locales from PHP
 xgettext $(find -type f -name "*.php") -o $LOCALES/$POTFILE -L PHP --add-comments=TRANS --from-code=UTF-8 --force-po --join-existing \
-    --keyword=__:1,2t -d $PLUGINNAME --copyright-holder "TICGAL" >/dev/null 2>&1
+    --keyword=__:1,2t --keyword=__s:1,2t -d $PLUGINNAME --copyright-holder "TICGAL" >/dev/null 2>&1
 
 echo Searching JS files...
 # Append locales from JavaScript
 xgettext $(find -type f -name "*.js") -o $LOCALES/$POTFILE -L JavaScript --add-comments=TRANS --from-code=UTF-8 --force-po --join-existing \
-    --keyword=__:1,2t -d $PLUGINNAME --copyright-holder "TICGAL" >/dev/null 2>&1
+    --keyword=__:1,2t --keyword=__s:1,2t -d $PLUGINNAME --copyright-holder "TICGAL" >/dev/null 2>&1
 
 echo Searching TWIG files...
 # Append locales from Twig templates
@@ -43,7 +43,7 @@ for file in $(find ./templates -type f -name "*.twig"); do
     # 2. Replace "standard input:line_no" by file location in po file comments
     contents=$(cat $file | sed -r "s|\{\{\s*([a-z0-9_]+\(.*\))\s*\}\}|<?php \1; ?>|gi")
     cat $file | perl -0pe "s/\{\{(.*?)\}\}/<?php \1; ?>/gism" | xgettext - -o $LOCALES/$POTFILE -L PHP --add-comments=TRANS --from-code=UTF-8 --force-po --join-existing \
-        --keyword=__:1,2t -d $PLUGINNAME --copyright-holder "TICGAL"
+        --keyword=__:1,2t --keyword=__s:1,2t -d $PLUGINNAME --copyright-holder "TICGAL"
     sed -i -r "s|standard input:([0-9]+)|$(echo $file | sed "s|./||"):\1|g" $LOCALES/$POTFILE
 done
 

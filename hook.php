@@ -68,7 +68,7 @@ function plugin_geolocation_uninstall()
 function plugin_geolocation_postitemform($params = [])
 {
     if (isset($params['item']) && $params['item'] instanceof CommonDBTM) {
-        if (Session::haveRight(PluginGeolocationGeolocation::$rightname, READ)) {
+        if (PluginGeolocationGeolocation::canView()) {
             switch ($params['item']::getType()) {
                 case Ticket::getType():
                     PluginGeolocationGeolocation::showGeolocation($params['item']);
@@ -81,14 +81,14 @@ function plugin_geolocation_postitemform($params = [])
 function plugin_geolocation_ticket_add(Ticket $ticket)
 {
     if (isset($ticket->input['latitude']) && !empty($ticket->input['latitude']) && isset($ticket->input['longitude']) && !empty($ticket->input['longitude'])) {
-        if (Session::haveRight(PluginGeolocationGeolocation::$rightname, CREATE)) {
-            $input = [
-                'itemtype' => $ticket::getType(),
-                'items_id' => $ticket->getID(),
-                'latitude' => $ticket->input['latitude'],
-                'longitude' => $ticket->input['longitude'],
-            ];
-            $geolocation = new PluginGeolocationGeolocation();
+        $input = [
+            'itemtype' => $ticket::getType(),
+            'items_id' => $ticket->getID(),
+            'latitude' => $ticket->input['latitude'],
+            'longitude' => $ticket->input['longitude'],
+        ];
+        $geolocation = new PluginGeolocationGeolocation();
+        if ($geolocation->can(-1, CREATE, $input)) {
             $geolocation->add($input);
         }
     } elseif (isset($ticket->input['locations_id']) && $ticket->input['locations_id'] > 0) {
@@ -107,13 +107,17 @@ function plugin_geolocation_ticket_add(Ticket $ticket)
     }
 }
 
+/**
+ * Rights are checked per item, like in front/geolocation.form.php: the core ticket form only
+ * checks the global ticket right, and this hook runs before the ticket input is validated.
+ */
 function plugin_geolocation_ticket_update(Ticket $ticket)
 {
     if (isset($ticket->input['latitude']) &&  isset($ticket->input['longitude'])) {
         $geolocation = new PluginGeolocationGeolocation();
         if (!empty($ticket->input['latitude']) && !empty($ticket->input['longitude'])) {
             if ($geolocation->getFromDBByCrit(['itemtype' => $ticket::getType(), 'items_id' => $ticket->getID()])) {
-                if ($geolocation::canUpdate()) {
+                if ($geolocation->can($geolocation->getID(), UPDATE)) {
                     $input = [
                         'id' => $geolocation->getID(),
                         'latitude' => $ticket->input['latitude'],
@@ -122,27 +126,23 @@ function plugin_geolocation_ticket_update(Ticket $ticket)
                     $geolocation->update($input);
                 }
             } else {
-                if (Session::haveRight(PluginGeolocationGeolocation::$rightname, CREATE)) {
-                    $input = [
-                        'itemtype' => $ticket::getType(),
-                        'items_id' => $ticket->getID(),
-                        'latitude' => $ticket->input['latitude'],
-                        'longitude' => $ticket->input['longitude'],
-                    ];
+                $input = [
+                    'itemtype' => $ticket::getType(),
+                    'items_id' => $ticket->getID(),
+                    'latitude' => $ticket->input['latitude'],
+                    'longitude' => $ticket->input['longitude'],
+                ];
+                if ($geolocation->can(-1, CREATE, $input)) {
                     $geolocation->add($input);
                 }
             }
         } elseif (empty($ticket->input['latitude']) && empty($ticket->input['longitude'])) {
-            if ($geolocation->getFromDBByCrit(['itemtype' => $ticket::getType(), 'items_id' => $ticket->getID()]) && Session::haveRight(PluginGeolocationGeolocation::$rightname, PURGE)) {
+            if (
+                $geolocation->getFromDBByCrit(['itemtype' => $ticket::getType(), 'items_id' => $ticket->getID()])
+                && $geolocation->can($geolocation->getID(), PURGE)
+            ) {
                 $geolocation->delete(['id' => $geolocation->getID()], true);
             }
         }
-    }
-}
-
-function plugin_geolocation_changeProfile()
-{
-    if (isset($_SESSION['glpiactiveprofile']['interface']) && $_SESSION['glpiactiveprofile']['interface'] == 'helpdesk') {
-        $_SESSION['glpiactiveprofile'] = array_merge($_SESSION['glpiactiveprofile'], ProfileRight::getProfileRights($_SESSION['glpiactiveprofile']['id'], [PluginGeolocationGeolocation::$rightname]));
     }
 }
