@@ -1,41 +1,38 @@
 # Changelog for Geolocation
+<!-- changelog-format: 2 -->
 
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.0.0-beta.1] - 2026-10-08
-### Added
-- GLPI 12 compatibility
-### Security
-- Includes the security fixes from 2.0.1
-- Saving a ticket only changes its geolocation when the user can modify that ticket. Users who could only see it, such as observers, could change or remove it
-- Geolocations can only be added to tickets and the itemtypes enabled in the settings, and cannot be moved to another item
-- The map page and its data endpoint only accept tickets and the itemtypes enabled in the settings, and check the read right on that itemtype
-- The map data endpoint requires the Geolocation read right
-- Escape item names and links in the map pop-ups and the coordinate fields
-- Saving the plugin settings requires re-authentication, like GLPI setup
-- The settings only accept itemtypes that GLPI allows to geolocate
-### Changed
-- Classes moved to src/ with the GlpiPlugin\Geolocation namespace. The PluginGeolocation* class names remain as deprecated aliases for other plugins. The history saved with the old class name is updated on upgrade
-- The profile offers the "Delete permanently" right instead of "Delete", which is what removing a geolocation requires. Profiles that had "Delete" get it on upgrade
-- Uninstalling the plugin drops its tables
-- Settings form and search map rendered with Twig templates
-- Tabler icons instead of Font Awesome
-- PHPStan configuration works both locally and in CI
-- Unique Composer autoloader suffix and removed the unused php-qrcode dependency
-### Fixed
-- Latitude and longitude are validated, invalid values no longer cause a database error
-- Adding a second geolocation to the same item, or moving one onto an item that already has one, no longer causes a database error
-- The "Reload" link of the search map lost the itemtype
-- Users with the delete right could not remove a geolocation
+## [Unreleased]
+
+## [3.0.0] - 2026-11-03
+### Features
+- Compatible with GLPI 12.
+- Removing a geolocation now uses the "Delete permanently" profile right, which is granted on upgrade to profiles that had "Delete".
+- Uninstalling the plugin removes all its data.
+- Saving the plugin settings asks for your password again, like the GLPI setup.
+### Bugs
+- Includes the security fixes from 2.0.1.
+- Users who could only see a ticket, such as observers, could change or remove its geolocation.
+- Geolocations could be added to any type of item, not only to tickets and the types enabled in the settings.
+- Moving a geolocation to another item is no longer possible.
+- Adding a second geolocation to the same item caused a database error.
+- The map could show items of types that are not enabled in the settings or that the user cannot view.
+- The map data was available to users without the Geolocation read right.
+- Item names in the map pop-ups and the coordinate fields could run malicious code.
+- The settings accepted item types that GLPI does not allow to geolocate.
+- Invalid latitude or longitude values caused a database error.
+- The "Reload" link of the map lost the selected item type.
+- Users with the delete right could not remove a geolocation.
 
 ## [2.0.0] - 2026-01-19
-### Added
+### Features
 - GLPI 11 compatibility
 
 ## [1.0.0] - 2023-12-12
-### Added
+### Features
 - New tab for assets geolocation.
 - A new map is added to choose coordinates.

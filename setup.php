@@ -34,7 +34,7 @@ use GlpiPlugin\Geolocation\Config;
 use GlpiPlugin\Geolocation\Geolocation;
 use GlpiPlugin\Geolocation\Profile;
 
-define('PLUGIN_GEOLOCATION_VERSION', '3.0.0-beta.1');
+define('PLUGIN_GEOLOCATION_VERSION', '3.0.0');
 define('PLUGIN_GEOLOCATION_MIN_GLPI', '12.0.0');
 define('PLUGIN_GEOLOCATION_MAX_GLPI', '12.1.0');
 define('PLUGIN_GEOLOCATION_ICON', 'ti ti-pinned');
