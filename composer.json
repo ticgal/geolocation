@@ -12,7 +12,7 @@
     },
     "config": {
         "optimize-autoloader": true,
-        "autoloader-suffix": "Geolocation",
+        "autoloader-suffix": "PluginGeolocation",
         "platform": {
             "php": "8.3.0"
         },
