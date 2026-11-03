@@ -29,6 +29,8 @@ along with Geolocation. If not, see <http://www.gnu.org/licenses/>.
 ----------------------------------------------------------------------
 */
 
+use GlpiPlugin\Geolocation\Geolocation;
+
 header("Content-Type: application/json; charset=UTF-8");
 Html::header_nocache();
 
@@ -50,8 +52,8 @@ if (!is_string($itemtype) || !is_array($params)) {
 }
 
 if (
-    !in_array($itemtype, PluginGeolocationGeolocation::getAllowedItemtypes(), true)
-    || !Session::haveRight(PluginGeolocationGeolocation::$rightname, READ)
+    !in_array($itemtype, Geolocation::getAllowedItemtypes(), true)
+    || !Session::haveRight(Geolocation::$rightname, READ)
     || !$itemtype::canView()
 ) {
     http_response_code(403);
@@ -74,7 +76,7 @@ foreach ($data['data']['rows'] as $row) {
 $points = [];
 if (count($titles) > 0) {
     $iterator = $DB->request([
-        'FROM' => PluginGeolocationGeolocation::getTable(),
+        'FROM' => Geolocation::getTable(),
         'WHERE' => [
             'itemtype' => $itemtype,
             'items_id' => array_keys($titles),

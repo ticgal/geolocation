@@ -31,15 +31,16 @@
 
 use Glpi\Exception\Http\AccessDeniedHttpException;
 use Glpi\Exception\Http\BadRequestHttpException;
+use GlpiPlugin\Geolocation\Geolocation;
 
 Session::checkLoginUser();
 
-if (!Session::haveRight(PluginGeolocationGeolocation::$rightname, READ)) {
+if (!Session::haveRight(Geolocation::$rightname, READ)) {
     throw new AccessDeniedHttpException();
 }
 
 $itemtype = $_GET['itemtype'] ?? null;
-if (!is_string($itemtype) || !in_array($itemtype, PluginGeolocationGeolocation::getAllowedItemtypes(), true)) {
+if (!is_string($itemtype) || !in_array($itemtype, Geolocation::getAllowedItemtypes(), true)) {
     throw new BadRequestHttpException();
 }
 if (!$itemtype::canView()) {
@@ -52,6 +53,6 @@ if (is_a($itemtype, CommonITILObject::class, true)) {
 }
 Html::header($itemtype::getTypeName(Session::getPluralNumber()), '', $menu, $itemtype);
 
-PluginGeolocationGeolocation::show($itemtype);
+Geolocation::show($itemtype);
 
 Html::footer();

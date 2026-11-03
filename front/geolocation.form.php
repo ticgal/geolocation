@@ -29,7 +29,9 @@
  ----------------------------------------------------------------------
 */
 
-$geo = new PluginGeolocationGeolocation();
+use GlpiPlugin\Geolocation\Geolocation;
+
+$geo = new Geolocation();
 if (isset($_POST['add'])) {
     $geo->check(-1, CREATE, $_POST);
 

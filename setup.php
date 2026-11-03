@@ -30,10 +30,13 @@
 */
 
 use Glpi\Plugin\Hooks;
+use GlpiPlugin\Geolocation\Config;
+use GlpiPlugin\Geolocation\Geolocation;
+use GlpiPlugin\Geolocation\Profile;
 
-define('PLUGIN_GEOLOCATION_VERSION', '2.0.1');
-define('PLUGIN_GEOLOCATION_MIN_GLPI', '11.0.0');
-define('PLUGIN_GEOLOCATION_MAX_GLPI', '11.9');
+define('PLUGIN_GEOLOCATION_VERSION', '3.0.0');
+define('PLUGIN_GEOLOCATION_MIN_GLPI', '12.0.0');
+define('PLUGIN_GEOLOCATION_MAX_GLPI', '12.1.0');
 define('PLUGIN_GEOLOCATION_ICON', 'ti ti-pinned');
 
 function plugin_version_geolocation()
@@ -58,19 +61,18 @@ function plugin_init_geolocation()
     /** @var array $PLUGIN_HOOKS */
     global $PLUGIN_HOOKS;
 
-    $plugin = new Plugin();
-    if ($plugin->isActivated('geolocation')) {
-        Plugin::registerClass('PluginGeolocationConfig', ['addtabon' => 'Config']);
+    if (Plugin::isPluginActive('geolocation')) {
+        Plugin::registerClass(Config::class, ['addtabon' => 'Config']);
         $PLUGIN_HOOKS['config_page']['geolocation'] = 'front/config.form.php';
 
-        Plugin::registerClass('PluginGeolocationProfile', ['addtabon' => 'Profile']);
+        Plugin::registerClass(Profile::class, ['addtabon' => 'Profile']);
 
         // Self-service users only get the dedicated right; Profile::cleanProfile() strips every other one
-        if (!in_array(PluginGeolocationGeolocation::HELPDESK_RIGHTNAME, Profile::$helpdesk_rights, true)) {
-            Profile::$helpdesk_rights[] = PluginGeolocationGeolocation::HELPDESK_RIGHTNAME;
+        if (!in_array(Geolocation::HELPDESK_RIGHTNAME, \Profile::$helpdesk_rights, true)) {
+            \Profile::$helpdesk_rights[] = Geolocation::HELPDESK_RIGHTNAME;
         }
 
-        Plugin::registerClass('PluginGeolocationGeolocation', ['addtabon' => PluginGeolocationConfig::getUsedItemtypes()]);
+        Plugin::registerClass(Geolocation::class, ['addtabon' => Config::getUsedItemtypes()]);
 
         $PLUGIN_HOOKS[Hooks::POST_ITEM_FORM]['geolocation'] = 'plugin_geolocation_postitemform';
 
@@ -81,6 +83,6 @@ function plugin_init_geolocation()
             'Ticket' => 'plugin_geolocation_ticket_update',
         ];
 
-        $PLUGIN_HOOKS[Hooks::REDEFINE_MENUS]['geolocation'] = [PluginGeolocationGeolocation::class, 'geolocationRedefineMenu'];
+        $PLUGIN_HOOKS[Hooks::REDEFINE_MENUS]['geolocation'] = [Geolocation::class, 'geolocationRedefineMenu'];
     }
 }

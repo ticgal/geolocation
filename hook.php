@@ -29,17 +29,27 @@
  ----------------------------------------------------------------------
 */
 
-function plugin_geolocation_install()
+use GlpiPlugin\Geolocation\Config;
+use GlpiPlugin\Geolocation\Geolocation;
+use GlpiPlugin\Geolocation\Profile;
+
+/**
+ * Plugin classes with install()/uninstall() methods, in installation order
+ *
+ * @return class-string[]
+ */
+function plugin_geolocation_classes(): array
+{
+    return [Config::class, Geolocation::class, Profile::class];
+}
+
+function plugin_geolocation_install(): bool
 {
     $migration = new Migration(PLUGIN_GEOLOCATION_VERSION);
 
-    foreach (glob(dirname(__FILE__) . '/inc/*') as $filepath) {
-        if (preg_match("/inc.(.+)\.class.php/", $filepath, $matches)) {
-            $classname = 'PluginGeolocation' . ucfirst($matches[1]);
-            include_once($filepath);
-            if (method_exists($classname, 'install')) {
-                $classname::install($migration);
-            }
+    foreach (plugin_geolocation_classes() as $classname) {
+        if (method_exists($classname, 'install')) {
+            $classname::install($migration);
         }
     }
     $migration->executeMigration();
@@ -47,17 +57,13 @@ function plugin_geolocation_install()
     return true;
 }
 
-function plugin_geolocation_uninstall()
+function plugin_geolocation_uninstall(): bool
 {
     $migration = new Migration(PLUGIN_GEOLOCATION_VERSION);
 
-    foreach (glob(dirname(__FILE__) . '/inc/*') as $filepath) {
-        if (preg_match("/inc.(.+)\.class.php/", $filepath, $matches)) {
-            $classname = 'PluginGeolocation' . ucfirst($matches[1]);
-            include_once($filepath);
-            if (method_exists($classname, 'uninstall')) {
-                $classname::uninstall($migration);
-            }
+    foreach (plugin_geolocation_classes() as $classname) {
+        if (method_exists($classname, 'uninstall')) {
+            $classname::uninstall($migration);
         }
     }
     $migration->executeMigration();
@@ -68,12 +74,8 @@ function plugin_geolocation_uninstall()
 function plugin_geolocation_postitemform($params = [])
 {
     if (isset($params['item']) && $params['item'] instanceof CommonDBTM) {
-        if (PluginGeolocationGeolocation::canView()) {
-            switch ($params['item']::getType()) {
-                case Ticket::getType():
-                    PluginGeolocationGeolocation::showGeolocation($params['item']);
-                    break;
-            }
+        if ($params['item'] instanceof Ticket && Geolocation::canView()) {
+            Geolocation::showGeolocation($params['item']);
         }
     }
 }
@@ -87,7 +89,7 @@ function plugin_geolocation_ticket_add(Ticket $ticket)
             'latitude' => $ticket->input['latitude'],
             'longitude' => $ticket->input['longitude'],
         ];
-        $geolocation = new PluginGeolocationGeolocation();
+        $geolocation = new Geolocation();
         if ($geolocation->can(-1, CREATE, $input)) {
             $geolocation->add($input);
         }
@@ -101,7 +103,7 @@ function plugin_geolocation_ticket_add(Ticket $ticket)
                 'latitude' => $location->fields['latitude'],
                 'longitude' => $location->fields['longitude'],
             ];
-            $geolocation = new PluginGeolocationGeolocation();
+            $geolocation = new Geolocation();
             $geolocation->add($input);
         }
     }
@@ -109,12 +111,12 @@ function plugin_geolocation_ticket_add(Ticket $ticket)
 
 /**
  * Rights are checked per item, like in front/geolocation.form.php: the core ticket form only
- * checks the global ticket right, and this hook runs before the ticket input is validated.
+ * requires READ on the ticket, and this hook runs before the ticket input is validated.
  */
 function plugin_geolocation_ticket_update(Ticket $ticket)
 {
     if (isset($ticket->input['latitude']) &&  isset($ticket->input['longitude'])) {
-        $geolocation = new PluginGeolocationGeolocation();
+        $geolocation = new Geolocation();
         if (!empty($ticket->input['latitude']) && !empty($ticket->input['longitude'])) {
             if ($geolocation->getFromDBByCrit(['itemtype' => $ticket::getType(), 'items_id' => $ticket->getID()])) {
                 if ($geolocation->can($geolocation->getID(), UPDATE)) {

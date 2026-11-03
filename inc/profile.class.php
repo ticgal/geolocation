@@ -23,156 +23,17 @@
  @author    the TICGAL team
  @copyright Copyright (C) 2022 - 2026 TICGAL team
  @license   AGPL License 3.0 or (at your option) any later version
-                http://www.gnu.org/licenses/agpl-3.0-standalone.html
+            http://www.gnu.org/licenses/agpl-3.0-standalone.html
  @link      https://www.tic.gal
  @since     2022
  ----------------------------------------------------------------------
 */
 
-if (!defined('GLPI_ROOT')) {
-    die("Sorry. You can't access directly to this file");
-}
+/**
+ * @deprecated 3.0.0 Legacy class name kept for other plugins.
+ *             Use \GlpiPlugin\Geolocation\Profile instead.
+ */
 
-class PluginGeolocationProfile extends Profile
-{
-    public static $rightname = "profile";
+require_once __DIR__ . '/../src/Profile.php';
 
-    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
-    {
-        switch ($item->getType()) {
-            case 'Profile':
-                return self::createTabEntry('Geolocation');
-        }
-        return '';
-    }
-
-    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
-    {
-        switch ($item->getType()) {
-            case Profile::class:
-                /** @var Profile $item */
-                $profile = new self();
-                return $profile->showProfileForm($item);
-        }
-        return false;
-    }
-
-    /**
-     * Display the profile form for Geolocation rights: a self-service profile only gets the
-     * dedicated helpdesk right, a central profile only the central one.
-     * @param  Profile $profile
-     * @return bool
-     */
-    public function showProfileForm(Profile $profile)
-    {
-        if (!Session::haveRight("profile", READ)) {
-            return false;
-        }
-
-        $canedit = Session::haveRight("profile", UPDATE);
-
-        echo "<div class='spaced'>";
-        if ($canedit) {
-            echo "<form method='post' action='" . htmlspecialchars($profile::getFormURL()) . "'>";
-        }
-
-        if (($profile->fields['interface'] ?? '') === 'helpdesk') {
-            $rights = self::getHelpdeskRights();
-        } else {
-            $rights = self::getGeneralRights();
-        }
-
-        $matrix_options = [
-            'canedit' => $canedit,
-            'title'   => __('Geolocation', 'geolocation'),
-        ];
-
-        $profile->displayRightsChoiceMatrix($rights, $matrix_options);
-
-        if ($canedit) {
-            echo "<div class='text-center'>";
-            echo Html::hidden('id', ['value' => $profile->getID()]);
-            echo Html::submit(_sx('button', 'Save'), ['name' => 'update']);
-            echo "</div>\n";
-            Html::closeForm();
-        }
-        echo '</div>';
-        return true;
-    }
-
-    public static function getGeneralRights()
-    {
-        $rights = [];
-        $rights[] =  [
-            'rights' => [READ   => __('Read'), UPDATE => __('Update'), CREATE => __('Create'), DELETE => __('Delete')],
-            'itemtype' => 'PluginGeolocationGeolocation',
-            'label'    => __('Geolocation', 'geolocation'),
-            'field'    => 'plugin_geolocation_geolocation',
-        ];
-        return $rights;
-    }
-
-    public static function getHelpdeskRights()
-    {
-        return [
-            [
-                'rights' => [READ => __('Read'), CREATE => __('Create'), UPDATE => __('Update'), PURGE => _x('button', 'Delete permanently')],
-                'itemtype' => 'PluginGeolocationGeolocation',
-                'label'    => __('Geolocation of my tickets', 'geolocation'),
-                'field'    => PluginGeolocationGeolocation::HELPDESK_RIGHTNAME,
-            ],
-        ];
-    }
-
-    public static function install(Migration $migration)
-    {
-        /** @var \DBmysql $DB */
-        global $DB;
-
-        $helpdesk_right = PluginGeolocationGeolocation::HELPDESK_RIGHTNAME;
-        if (countElementsInTable(ProfileRight::getTable(), ['name' => $helpdesk_right]) > 0) {
-            return;
-        }
-        $migration->displayMessage("Adding right $helpdesk_right");
-        ProfileRight::addProfileRights([$helpdesk_right]);
-
-        // Up to 2.0.0 self-service profiles used the central right: move it to the dedicated one
-        $iterator = $DB->request([
-            'SELECT'     => [ProfileRight::getTable() . '.profiles_id', ProfileRight::getTable() . '.rights'],
-            'FROM'       => ProfileRight::getTable(),
-            'INNER JOIN' => [
-                Profile::getTable() => [
-                    'ON' => [
-                        Profile::getTable()      => 'id',
-                        ProfileRight::getTable() => 'profiles_id',
-                    ],
-                ],
-            ],
-            'WHERE'      => [
-                ProfileRight::getTable() . '.name'   => PluginGeolocationGeolocation::$rightname,
-                ProfileRight::getTable() . '.rights' => ['>', 0],
-                Profile::getTable() . '.interface'   => 'helpdesk',
-            ],
-        ]);
-        foreach ($iterator as $row) {
-            $rights = $row['rights'] & (READ | CREATE | UPDATE);
-            if ($row['rights'] & DELETE) {
-                $rights |= PURGE;
-            }
-            ProfileRight::updateProfileRights($row['profiles_id'], [
-                $helpdesk_right                          => $rights,
-                PluginGeolocationGeolocation::$rightname => 0,
-            ]);
-        }
-    }
-
-    public static function uninstall()
-    {
-        /** @var \DBmysql $DB */
-        global $DB;
-
-        $table = ProfileRight::getTable();
-        $query = "DELETE FROM $table WHERE `name` LIKE '%plugin_geolocation%'";
-        $DB->doQuery($query);
-    }
-}
+class_alias(\GlpiPlugin\Geolocation\Profile::class, 'PluginGeolocationProfile');
