@@ -10,26 +10,30 @@ msgstr ""
 "X-Generator: Localazy (https://localazy.com)\n"
 "Plural-Forms: nplurals=2; plural=(n==1) ? 0 : 1;\n"
 
-#: src/Geolocation.php:72 src/Geolocation.php:73 src/Profile.php:48
-#: src/Profile.php:91 src/Profile.php:116
+#: src/Geolocation.php:117 src/Geolocation.php:118 src/Profile.php:48
+#: src/Profile.php:92 src/Profile.php:123
 msgid "Geolocation"
 msgstr "Geolocation"
 
-#: src/Geolocation.php:110
+#: src/Geolocation.php:155
 msgid "Geolocation is not enabled for this type of item"
 msgstr "Geolocation is not enabled for this type of item"
 
-#: src/Geolocation.php:122
+#: src/Geolocation.php:167
 msgid "This item already has a geolocation"
 msgstr "This item already has a geolocation"
 
-#: src/Geolocation.php:140
+#: src/Geolocation.php:185
 msgid "A geolocation cannot be moved to another item"
 msgstr "A geolocation cannot be moved to another item"
 
-#: src/Geolocation.php:162
+#: src/Geolocation.php:207
 msgid "Invalid latitude or longitude"
 msgstr "Invalid latitude or longitude"
+
+#: src/Profile.php:138
+msgid "Geolocation of my tickets"
+msgstr "Geolocation of my tickets"
 
 #: templates/map.html.twig:58
 msgid "View item"

@@ -1,6 +1,7 @@
 /public/vendor
 /vendor
 composer.lock
+# Local-only docs (TICGAL remote): plans, audit reports, testing
 docs/*
 !docs/manual/
 docs/manual/*

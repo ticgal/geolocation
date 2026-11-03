@@ -67,7 +67,8 @@ class Profile extends CommonGLPI
     }
 
     /**
-     * Display the Geolocation rights matrix of a profile
+     * Display the Geolocation rights matrix of a profile: a self-service profile only gets the
+     * dedicated helpdesk right, a central profile only the central one.
      *
      * @param \Profile $profile
      *
@@ -91,7 +92,13 @@ class Profile extends CommonGLPI
             'title'   => __('Geolocation', 'geolocation'),
         ];
 
-        $profile->displayRightsChoiceMatrix(self::getGeneralRights(), $matrix_options);
+        if (($profile->fields['interface'] ?? '') === 'helpdesk') {
+            $rights = self::getHelpdeskRights();
+        } else {
+            $rights = self::getGeneralRights();
+        }
+
+        $profile->displayRightsChoiceMatrix($rights, $matrix_options);
 
         if ($canedit) {
             echo "<div class='text-center'>";
@@ -119,11 +126,69 @@ class Profile extends CommonGLPI
         ];
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public static function getHelpdeskRights(): array
+    {
+        return [
+            [
+                'rights'   => [READ => __('Read'), CREATE => __('Create'), UPDATE => __('Update'), PURGE => _x('button', 'Delete permanently')],
+                'itemtype' => Geolocation::class,
+                'label'    => __('Geolocation of my tickets', 'geolocation'),
+                'field'    => Geolocation::HELPDESK_RIGHTNAME,
+            ],
+        ];
+    }
+
+    public static function install(Migration $migration): void
+    {
+        /** @var \DBmysql $DB */
+        global $DB;
+
+        $helpdesk_right = Geolocation::HELPDESK_RIGHTNAME;
+        if (countElementsInTable(ProfileRight::getTable(), ['name' => $helpdesk_right]) > 0) {
+            return;
+        }
+        $migration->displayMessage("Adding right $helpdesk_right");
+        ProfileRight::addProfileRights([$helpdesk_right]);
+
+        // Up to 2.0.0 self-service profiles used the central right: move it to the dedicated one.
+        // Geolocation::install() runs first and has already turned DELETE into PURGE, both are handled.
+        $iterator = $DB->request([
+            'SELECT'     => [ProfileRight::getTable() . '.profiles_id', ProfileRight::getTable() . '.rights'],
+            'FROM'       => ProfileRight::getTable(),
+            'INNER JOIN' => [
+                \Profile::getTable() => [
+                    'ON' => [
+                        \Profile::getTable()     => 'id',
+                        ProfileRight::getTable() => 'profiles_id',
+                    ],
+                ],
+            ],
+            'WHERE'      => [
+                ProfileRight::getTable() . '.name'   => Geolocation::$rightname,
+                ProfileRight::getTable() . '.rights' => ['>', 0],
+                \Profile::getTable() . '.interface'  => 'helpdesk',
+            ],
+        ]);
+        foreach ($iterator as $row) {
+            $rights = $row['rights'] & (READ | CREATE | UPDATE | PURGE);
+            if ($row['rights'] & DELETE) {
+                $rights |= PURGE;
+            }
+            ProfileRight::updateProfileRights($row['profiles_id'], [
+                $helpdesk_right         => $rights,
+                Geolocation::$rightname => 0,
+            ]);
+        }
+    }
+
     public static function uninstall(Migration $migration): void
     {
         /** @var \DBmysql $DB */
         global $DB;
 
-        $DB->delete(ProfileRight::getTable(), ['name' => Geolocation::$rightname]);
+        $DB->delete(ProfileRight::getTable(), ['name' => [Geolocation::$rightname, Geolocation::HELPDESK_RIGHTNAME]]);
     }
 }

@@ -74,7 +74,7 @@ function plugin_geolocation_uninstall(): bool
 function plugin_geolocation_postitemform($params = [])
 {
     if (isset($params['item']) && $params['item'] instanceof CommonDBTM) {
-        if ($params['item'] instanceof Ticket && Session::haveRight(Geolocation::$rightname, READ)) {
+        if ($params['item'] instanceof Ticket && Geolocation::canView()) {
             Geolocation::showGeolocation($params['item']);
         }
     }
@@ -146,12 +146,5 @@ function plugin_geolocation_ticket_update(Ticket $ticket)
                 $geolocation->delete(['id' => $geolocation->getID()], true);
             }
         }
-    }
-}
-
-function plugin_geolocation_changeProfile()
-{
-    if (isset($_SESSION['glpiactiveprofile']['interface']) && $_SESSION['glpiactiveprofile']['interface'] == 'helpdesk') {
-        $_SESSION['glpiactiveprofile'] = array_merge($_SESSION['glpiactiveprofile'], ProfileRight::getProfileRights($_SESSION['glpiactiveprofile']['id'], [Geolocation::$rightname]));
     }
 }

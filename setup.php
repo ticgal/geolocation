@@ -67,6 +67,11 @@ function plugin_init_geolocation()
 
         Plugin::registerClass(Profile::class, ['addtabon' => 'Profile']);
 
+        // Self-service users only get the dedicated right; Profile::cleanProfile() strips every other one
+        if (!in_array(Geolocation::HELPDESK_RIGHTNAME, \Profile::$helpdesk_rights, true)) {
+            \Profile::$helpdesk_rights[] = Geolocation::HELPDESK_RIGHTNAME;
+        }
+
         Plugin::registerClass(Geolocation::class, ['addtabon' => Config::getUsedItemtypes()]);
 
         $PLUGIN_HOOKS[Hooks::POST_ITEM_FORM]['geolocation'] = 'plugin_geolocation_postitemform';
@@ -79,7 +84,5 @@ function plugin_init_geolocation()
         ];
 
         $PLUGIN_HOOKS[Hooks::REDEFINE_MENUS]['geolocation'] = [Geolocation::class, 'geolocationRedefineMenu'];
-
-        $PLUGIN_HOOKS[Hooks::CHANGE_PROFILE]['geolocation'] = 'plugin_geolocation_changeProfile';
     }
 }

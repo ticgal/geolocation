@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Geolocation\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-08 15:03+0200\n"
+"POT-Creation-Date: 2026-11-03 09:28+0100\n"
 "Language: es_ES\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -10,26 +10,30 @@ msgstr ""
 "X-Generator: Localazy (https://localazy.com)\n"
 "Plural-Forms: nplurals=2; plural=(n==1) ? 0 : 1;\n"
 
-#: src/Geolocation.php:72 src/Geolocation.php:73 src/Profile.php:48
-#: src/Profile.php:91 src/Profile.php:116
+#: src/Geolocation.php:117 src/Geolocation.php:118 src/Profile.php:48
+#: src/Profile.php:92 src/Profile.php:123
 msgid "Geolocation"
 msgstr "Geolocalización"
 
-#: src/Geolocation.php:110
+#: src/Geolocation.php:155
 msgid "Geolocation is not enabled for this type of item"
 msgstr "La geolocalización no está activada para este tipo de elemento"
 
-#: src/Geolocation.php:122
+#: src/Geolocation.php:167
 msgid "This item already has a geolocation"
 msgstr "Este elemento ya tiene una geolocalización"
 
-#: src/Geolocation.php:140
+#: src/Geolocation.php:185
 msgid "A geolocation cannot be moved to another item"
 msgstr "Una geolocalización no se puede mover a otro elemento"
 
-#: src/Geolocation.php:162
+#: src/Geolocation.php:207
 msgid "Invalid latitude or longitude"
 msgstr "Latitud o longitud no válida"
+
+#: src/Profile.php:138
+msgid "Geolocation of my tickets"
+msgstr "Geolocalización de mis tickets"
 
 #: templates/map.html.twig:58
 msgid "View item"

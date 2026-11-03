@@ -30,7 +30,7 @@
                     url: '{{ ajax_url|e('js') }}',
                     data: {
                         itemtype: itemtype,
-                        params: {{ params|json_encode|raw }}
+                        params: {{ params|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_HEX_AMP') b-or constant('JSON_HEX_APOS') b-or constant('JSON_HEX_QUOT'))|raw }}
                     }
                 }).done((data) => {
                     const _markers = L.markerClusterGroup({

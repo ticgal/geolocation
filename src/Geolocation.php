@@ -38,6 +38,7 @@ use DBConnection;
 use Glpi\Application\View\TemplateRenderer;
 use Glpi\DBAL\QueryExpression;
 use Html;
+use Log;
 use Migration;
 use ProfileRight;
 use Search;
@@ -51,19 +52,63 @@ class Geolocation extends CommonDBChild
     public bool $dohistory         = true;
     public static string $rightname = 'plugin_geolocation_geolocation';
 
+    /**
+     * Right of the simplified interface: geolocation of the user's own tickets only.
+     * It is listed in Profile::$helpdesk_rights (see setup.php), the central right is not.
+     */
+    public const HELPDESK_RIGHTNAME = 'plugin_geolocation_helpdesk';
+
     public static function getTypeName($nb = 0): string
     {
         return 'Geolocation';
     }
 
     /**
+     * Right checked for the current interface.
+     */
+    public static function getInterfaceRightname(): string
+    {
+        return Session::getCurrentInterface() === 'helpdesk' ? self::HELPDESK_RIGHTNAME : self::$rightname;
+    }
+
+    public static function canView(): bool
+    {
+        return Session::haveRight(self::getInterfaceRightname(), READ) && static::canChild('canView');
+    }
+
+    public static function canCreate(): bool
+    {
+        return Session::haveRight(self::getInterfaceRightname(), CREATE) && static::canChild('canUpdate');
+    }
+
+    public static function canUpdate(): bool
+    {
+        return Session::haveRight(self::getInterfaceRightname(), UPDATE) && static::canChild('canUpdate');
+    }
+
+    public static function canDelete(): bool
+    {
+        return Session::haveRight(self::getInterfaceRightname(), DELETE) && static::canChild('canUpdate');
+    }
+
+    public static function canPurge(): bool
+    {
+        return Session::haveRight(self::getInterfaceRightname(), PURGE) && static::canChild('canUpdate');
+    }
+
+    /**
      * Itemtypes whose geolocations can be displayed: tickets and the itemtypes enabled in the plugin settings.
+     * The simplified interface only handles tickets.
      *
      * @return string[]
      */
     public static function getAllowedItemtypes(): array
     {
-        return array_values(array_unique(array_merge([Ticket::class], Config::getUsedItemtypes())));
+        if (Session::getCurrentInterface() === 'helpdesk') {
+            return [Ticket::class];
+        }
+        $used = array_filter(Config::getUsedItemtypes(), fn($itemtype) => is_a($itemtype, CommonDBTM::class, true));
+        return array_values(array_unique(array_merge([Ticket::class], $used)));
     }
 
     public static function geolocationRedefineMenu($menus)
@@ -331,8 +376,8 @@ class Geolocation extends CommonDBChild
         var finalizeMap = function() {
             var geocoder = L.Control.geocoder({
                 defaultMarkGeocode: false,
-                errorMessage: '" . __s('No result found') . "',
-                placeholder: '" . __s('Search') . "'
+                errorMessage: " . self::jsValue(__s('No result found')) . ",
+                placeholder: " . self::jsValue(__('Search')) . "
             });
             geocoder.on('markgeocode', function(e) {
                 this._map.fitBounds(e.geocode.bbox);
@@ -357,7 +402,7 @@ class Geolocation extends CommonDBChild
                var _clat = _popup._latlng.lat.toString();
                var _clng = _popup._latlng.lng.toString();
 
-               _popup.setContent('<p><a href=\'#\'>" . __s('Set location here') . "</a></p>');
+               _popup.setContent('<p><a href=\'#\'>' + " . self::jsValue(__s('Set location here')) . " + '</a></p>');
 
                $(_container).find('a').on('click', function(e){
                   e.preventDefault();
@@ -425,6 +470,14 @@ class Geolocation extends CommonDBChild
         return PLUGIN_GEOLOCATION_ICON;
     }
 
+    /**
+     * Encode a value as a JavaScript literal that is safe inside an inline <script>.
+     */
+    private static function jsValue(mixed $value): string
+    {
+        return json_encode($value, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+    }
+
     public static function install(Migration $migration): void
     {
         /** @var \DBmysql $DB */
@@ -467,6 +520,16 @@ class Geolocation extends CommonDBChild
 
     public static function uninstall(Migration $migration): void
     {
+        /** @var \DBmysql $DB */
+        global $DB;
+
+        // Coordinates may locate people: drop them and their history, a reinstall must not reattach them
+        $DB->delete(Log::getTable(), [
+            'OR' => [
+                'itemtype'      => self::class,
+                'itemtype_link' => self::class,
+            ],
+        ]);
         $migration->dropTable(self::getTable());
     }
 }
