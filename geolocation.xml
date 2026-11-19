@@ -50,16 +50,9 @@
          <tag>Helpdesk</tag>
          <tag>Ticket</tag>
       </en>
-   </tags>
-   <screenshots>
-      <screenshot>
-         https://raw.githubusercontent.com/ticgal/geolocation/multimedia/geolocation-glpi-plugin-1.png
-      </screenshot>
-      <screenshot>
-         https://raw.githubusercontent.com/ticgal/geolocation/multimedia/geolocation-glpi-plugin-2.png
-      </screenshot>
-      <screenshot>
-         https://raw.githubusercontent.com/ticgal/geolocation/multimedia/geolocation-glpi-plugin-3.png
-      </screenshot>
+     <screenshots>
+      <screenshot>https://raw.githubusercontent.com/ticgal/geolocation/multimedia/geolocation-glpi-plugin-1.png</screenshot>
+      <screenshot>https://raw.githubusercontent.com/ticgal/geolocation/multimedia/geolocation-glpi-plugin-2.png</screenshot>
+      <screenshot>https://raw.githubusercontent.com/ticgal/geolocation/multimedia/geolocation-glpi-plugin-3.png</screenshot>
    </screenshots>
 </root>
